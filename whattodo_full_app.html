@@ -1,0 +1,509 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-family:'Inter',sans-serif}
+@keyframes popIn{0%{opacity:0;transform:scale(.9) translateY(8px)}70%{transform:scale(1.02)}100%{opacity:1;transform:scale(1)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(100%)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.wrap{max-width:380px;margin:0 auto;background:#0c0c0c;border-radius:20px;overflow:hidden;color:#f0ede8}
+.head{padding:18px 18px 10px}
+.app-title{font-family:'Bebas Neue',sans-serif;font-size:34px;line-height:1;letter-spacing:1px}
+.app-sub{font-size:11px;color:#555;margin-top:3px}
+.toolbar{display:flex;gap:8px;padding:10px 18px}
+.filter-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:9px;background:#141414;border:1px solid #232323;border-radius:10px;font-size:12px;color:#ccc;cursor:pointer;position:relative}
+.filter-count{position:absolute;top:-5px;right:-5px;background:#d4900f;color:#0c0c0c;font-size:9px;font-weight:600;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.cats-scroll{display:flex;gap:7px;overflow-x:auto;padding:8px 18px 14px;scrollbar-width:none}
+.cats-scroll::-webkit-scrollbar{display:none}
+.cat-chip{flex-shrink:0;display:flex;align-items:center;gap:5px;padding:7px 13px;border-radius:100px;border:1px solid #232323;font-size:12px;color:#666;cursor:pointer;white-space:nowrap;transition:all .15s}
+.cat-chip.active{color:#0c0c0c;border-color:transparent;font-weight:600}
+.result-zone{padding:0 18px 14px;min-height:160px}
+.empty{min-height:160px;background:#121212;border-radius:16px;border:1px solid #1c1c1c;display:flex;align-items:center;justify-content:center;padding:20px}
+.empty-txt{font-size:13px;color:#3a3a3a;text-align:center;line-height:1.7}
+.card{background:#131313;border-radius:16px;border:1px solid #1f1f1f;padding:18px;animation:popIn .35s cubic-bezier(.34,1.4,.64,1) both;position:relative}
+.card-badge{display:inline-block;padding:3px 9px;border-radius:100px;font-size:9px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;margin-bottom:10px}
+.card-title{font-size:17px;font-weight:500;line-height:1.35;margin-bottom:6px}
+.card-sub{font-size:12px;color:#777;line-height:1.5;font-style:italic}
+.tag-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:12px}
+.tag{font-size:9px;color:#555;background:#1a1a1a;padding:3px 7px;border-radius:6px}
+.btn-row{display:flex;gap:9px;padding:0 18px 18px}
+.btn-main{flex:1;padding:14px;background:#d4900f;border:none;border-radius:12px;font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:1.5px;color:#0c0c0c;cursor:pointer}
+.btn-main:disabled{opacity:.2}
+.btn-rand{padding:14px 16px;background:#141414;border:1px solid #232323;border-radius:12px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:.5px;color:#f0ede8;cursor:pointer;white-space:nowrap}
+.overlay{position:absolute;inset:0;background:rgba(0,0,0,.9);display:none;flex-direction:column;justify-content:flex-end;z-index:30;border-radius:20px}
+.overlay.open{display:flex}
+.sheet{background:#101010;border-radius:20px 20px 0 0;padding:16px 18px 22px;max-height:520px;overflow-y:auto;animation:slideUp .3s ease both}
+.sheet-handle{width:32px;height:3px;background:#222;border-radius:2px;margin:0 auto 14px}
+.sheet-title{font-family:'Bebas Neue',sans-serif;font-size:22px;margin-bottom:14px}
+.filter-group{margin-bottom:18px}
+.filter-label{font-size:10px;font-weight:600;color:#444;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.opt-grid{display:flex;flex-wrap:wrap;gap:6px}
+.opt{padding:7px 12px;border-radius:100px;border:1px solid #232323;font-size:11px;color:#777;cursor:pointer}
+.opt.sel{background:#d4900f;border-color:#d4900f;color:#0c0c0c;font-weight:500}
+.sheet-actions{display:flex;gap:10px;margin-top:8px}
+.btn-clear{flex:1;padding:12px;background:none;border:1px solid #232323;border-radius:10px;color:#666;font-size:12px;cursor:pointer}
+.btn-apply{flex:2;padding:12px;background:#d4900f;border:none;border-radius:10px;color:#0c0c0c;font-size:12px;font-weight:600;cursor:pointer}
+</style>
+
+<h2 class="sr-only">What To Do Today app with category selection, filters, and random idea generator</h2>
+
+<div class="wrap">
+  <div class="head">
+    <div class="app-title">WHAT TO<br>DO TODAY</div>
+    <div class="app-sub" id="resultCount">izberi kategorijo ali pritisni random</div>
+  </div>
+
+  <div class="toolbar">
+    <button class="filter-btn" onclick="openFilters()">
+      <i class="ti ti-adjustments-horizontal" style="font-size:14px"></i> Filtri
+      <span class="filter-count" id="fcount" style="display:none">0</span>
+    </button>
+  </div>
+
+  <div class="cats-scroll" id="catsRow"></div>
+
+  <div class="result-zone" id="resultZone">
+    <div class="empty"><div class="empty-txt">izberi kategorijo<br>ali pritisni Random</div></div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn-main" id="btnMain" disabled onclick="rollIdea()">RANDOM</button>
+    <button class="btn-rand" onclick="surpriseMe()">✦ SURPRISE</button>
+  </div>
+
+  <div class="overlay" id="filterOverlay" onclick="closeFiltersBg(event)">
+    <div class="sheet" onclick="event.stopPropagation()">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">Filtri</div>
+      <div id="filterGroups"></div>
+      <div class="sheet-actions">
+        <button class="btn-clear" onclick="clearFilters()">Počisti</button>
+        <button class="btn-apply" onclick="closeFilters()">Uporabi</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const DATA = {
+adventure:{label:'Adventure',emoji:'🏕️',color:'#c87020',ideas:[
+{t:"Get off at a train stop you've never heard of and explore it",s:"Somebody's favourite café is probably hiding there",people:['Solo','Friends'],loc:['City','Nature'],cost:'Free',dur:'Half Day',energy:'Active'},
+{t:"Find the place with the weirdest name within 50km and go see it",s:"There's only one way to find out why it's called that",people:['Solo','Friends'],loc:['Road Trip'],cost:'Under €10',dur:'Full Day',energy:'Chill'},
+{t:"Jump into a nearby lake or sea",s:"Your nervous system is about to receive important news",people:['Friends','Couple'],loc:['Nature'],cost:'Free',dur:'30min',energy:'High Energy'},
+{t:"Zoom out on Google Maps and pick somewhere random to go today",s:"Today's destination has been selected by fate",people:['Friends','Solo'],loc:['Road Trip'],cost:'Under €10',dur:'Full Day',energy:'Active'},
+{t:"Go horseback riding",s:"Yeah I'm gonna take my horse to the…",people:['Friends','Couple'],loc:['Nature'],cost:'Under €50',dur:'Half Day',energy:'Active'},
+{t:"Sleep in a tent",s:'Hotels are nice, but bears make memories',people:['Friends','Couple'],loc:['Nature'],cost:'Under €20',dur:'Multiple Days',energy:'Chill'},
+{t:"Try climbing or bouldering",s:"Don't look down… don't look down…",people:['Friends','Solo'],loc:['Nature','City'],cost:'Under €20',dur:'Half Day',energy:'High Energy'},
+{t:"Go cliff jumping",s:'Brain says AAH, you say AAAAAAH',people:['Friends'],loc:['Nature'],cost:'Free',dur:'Half Day',energy:'High Energy'},
+{t:"Find the scariest ride in the amusement park",s:'Who will scream the loudest?',people:['Friends','Family'],loc:['City'],cost:'Under €50',dur:'Full Day',energy:'High Energy'},
+{t:"Try scuba diving",s:'ATLANTIS HERE WE COME',people:['Friends','Couple'],loc:['Nature'],cost:'Under €50',dur:'Half Day',energy:'Active'},
+{t:"Take a helicopter ride",s:'Expensive? Yes. Once in a lifetime? Also yes',people:['Friends','Couple'],loc:['City','Nature'],cost:'Expensive',dur:'Half Day',energy:'Chill'},
+{t:"You could go fishing",s:'The supermarket has made us soft',people:['Friends','Solo'],loc:['Nature'],cost:'Free',dur:'Full Day',energy:'Active'},
+{t:"Rent a boat for a day",s:'Getting stranded in the middle of the sea with friends?! FUN',people:['Friends'],loc:['Nature'],cost:'Under €50',dur:'Full Day',energy:'Chill'},
+{t:"Try surfing",s:'Radical…',people:['Friends','Solo'],loc:['Nature'],cost:'Under €50',dur:'Full Day',energy:'High Energy'},
+{t:"Find an adrenaline park nearby",s:'Who do you think will be the most scared?',people:['Friends','Family'],loc:['City','Nature'],cost:'Under €50',dur:'Half Day',energy:'High Energy'},
+{t:"Sleep somewhere weird",s:'Treehouse. Lighthouse. Castle. Go crazy with it',people:['Friends','Couple'],loc:['Nature'],cost:'Under €50',dur:'Multiple Days',energy:'Chill'},
+{t:"Climb a mountain",s:"Preferably don't start with Everest",people:['Friends','Solo'],loc:['Nature'],cost:'Free',dur:'Full Day',energy:'High Energy'},
+{t:"Hike through some pretty trails",s:'Pretty views, delicious snacks, healthy choices',people:['Friends','Solo','Family'],loc:['Nature'],cost:'Free',dur:'Full Day',energy:'Active'},
+{t:"Go night swimming",s:"The sea gets way bigger when you can't see the bottom",people:['Friends','Couple'],loc:['Nature'],cost:'Free',dur:'1 Hour',energy:'Active'},
+{t:"Board the next train or bus without checking where it's going",s:'Future you can figure it out',people:['Solo','Friends'],loc:['City'],cost:'Under €10',dur:'Full Day',energy:'Chill'},
+{t:'Book something you\'ve always said "one day" about',s:'One day is suspiciously similar to today',people:['Solo','Couple','Friends'],loc:['Road Trip'],cost:'Under €50',dur:'Full Day',energy:'Active'},
+{t:"Drive somewhere with zero light pollution",s:'Stars are kind of ridiculous without street lamps competing',people:['Friends','Couple'],loc:['Nature'],cost:'Under €10',dur:'Evening',energy:'Chill'},
+{t:"Buy the cheapest ticket to another country and spend a day there",s:'Tristan da Cunha people will not like this one',people:['Friends','Solo','Couple'],loc:['Road Trip'],cost:'Under €50',dur:'Multiple Days',energy:'Active'},
+{t:"Get on a train with no return ticket",s:'Future you seems like a capable guy',people:['Solo','Friends'],loc:['Road Trip'],cost:'Under €20',dur:'Multiple Days',energy:'Active'},
+{t:"Go skydiving",s:"Momma didn't raise no b****!",people:['Friends','Solo'],loc:['Nature'],cost:'Expensive',dur:'Half Day',energy:'High Energy'},
+{t:"Find the coldest river nearby and jump in",s:'Everyone acts tough until the first toe enters the water',people:['Friends'],loc:['Nature'],cost:'Free',dur:'30min',energy:'High Energy'},
+{t:"Find a cave and go explore it",s:'Or actually take a tour guide? Just saying…',people:['Friends','Solo'],loc:['Nature'],cost:'Under €20',dur:'Half Day',energy:'Active'},
+{t:"Spend a night in a mountain hut",s:'What was that sound?',people:['Friends','Couple'],loc:['Nature'],cost:'Under €20',dur:'Multiple Days',energy:'Active'},
+{t:"Rent jet skis",s:'Childhood dreams and poor financial decisions finally meet',people:['Friends','Couple'],loc:['Nature'],cost:'Expensive',dur:'Half Day',energy:'High Energy'},
+{t:"Sleep in your car somewhere beautiful",s:'Five-star view, one-star mattress',people:['Friends','Couple','Solo'],loc:['Nature'],cost:'Free',dur:'Multiple Days',energy:'Chill'},
+{t:"Wake up early to see the sunrise",s:"Don't give me that look…",people:['Solo','Couple','Friends'],loc:['Nature'],cost:'Free',dur:'Morning',energy:'Chill'},
+{t:"Make a campfire and cook food on it",s:'Bonus points for guitar players',people:['Friends','Family'],loc:['Nature'],cost:'Under €10',dur:'Evening',energy:'Chill'},
+{t:"Camp in the rain",s:'Cozy, nature and hot tea — what more do you need?',people:['Friends','Couple'],loc:['Nature'],cost:'Under €20',dur:'Multiple Days',energy:'Chill'},
+{t:"Sleep outside with no tent",s:'It looked easier watching Bear Grylls do it',people:['Friends'],loc:['Nature'],cost:'Free',dur:'Multiple Days',energy:'Active'},
+{t:"Explore abandoned buildings nearby",s:'It was the wind bro, I swear',people:['Friends'],loc:['City','Nature'],cost:'Free',dur:'Half Day',energy:'Active'},
+{t:"Ask a stranger for a hidden gem",s:'The real adventure is the friends we made along the way',people:['Solo','Friends'],loc:['City'],cost:'Free',dur:'Half Day',energy:'Chill'},
+{t:"Try paragliding",s:'The ground looks fake from up here',people:['Friends','Couple'],loc:['Nature'],cost:'Expensive',dur:'Half Day',energy:'High Energy'},
+{t:"Go kayaking or canoeing",s:'Arms will hurt. Worth it',people:['Friends','Couple','Solo'],loc:['Nature'],cost:'Under €20',dur:'Half Day',energy:'Active'},
+{t:"Try a via ferrata",s:'Like climbing, but with a safety wire and a whole lot of trust',people:['Friends','Solo'],loc:['Nature'],cost:'Under €20',dur:'Full Day',energy:'High Energy'},
+{t:"Do a night hike with headlamps",s:'Who dares exploring the woods like this?',people:['Friends'],loc:['Nature'],cost:'Free',dur:'Evening',energy:'Active'},
+{t:"Try rafting with your friends",s:'The river has opinions. Respect them',people:['Friends'],loc:['Nature'],cost:'Under €50',dur:'Half Day',energy:'High Energy'},
+{t:"Find a waterfall and swim in it",s:"Nature's original infinity pool",people:['Friends','Couple'],loc:['Nature'],cost:'Free',dur:'Full Day',energy:'Active'},
+{t:"Go mountain biking downhill",s:'Gravity does half the work. Fear does the other half',people:['Friends','Solo'],loc:['Nature'],cost:'Under €50',dur:'Half Day',energy:'High Energy'},
+{t:"Try an outdoor survival challange",s:'2/3 days no phone. Now what?',people:['Friends','Solo'],loc:['Nature'],cost:'Under €50',dur:'Full Day',energy:'High Energy'},
+{t:"Go bungee jumping",s:'Your body will file a complaint. Sign it anyway',people:['Friends','Solo'],loc:['Nature'],cost:'Expensive',dur:'Half Day',energy:'High Energy'},
+{t:"Find a local legend or folklore location and visit it",s:'Every town has a story. Go find yours',people:['Friends','Solo'],loc:['Nature','City'],cost:'Free',dur:'Half Day',energy:'Chill'},
+{t:"Rent motorbikes (or bikes) for the day and explore",s:'Wind in your hair, poor decisions ahead',people:['Friends','Couple'],loc:['Road Trip'],cost:'Under €50',dur:'Full Day',energy:'Active'},
+{t:"Try coasteering",s:'Jumping off rocks into the sea like nature intended',people:['Friends'],loc:['Nature'],cost:'Under €20',dur:'Half Day',energy:'High Energy'},
+{t:"Build a raft and actually test it",s:'Minecraft logic meets real consequences',people:['Friends'],loc:['Nature'],cost:'Under €10',dur:'Full Day',energy:'Active'},
+{t:"Do something you've always been too scared to do",s:'You already know what it is',people:['Solo','Friends'],loc:['Anywhere'],cost:'Varies',dur:'Varies',energy:'High Energy'},
+{t:"Seek for geodes or other natural treasures",s:'The earth has been hiding things. Time to find them',people:['Friends','Family','Solo'],loc:['Nature'],cost:'Free',dur:'Half Day',energy:'Active'}
+]},
+chill:{label:'Chill',emoji:'☁️',color:'#2e9e6e',ideas:[
+{t:"Find a pretty spot and listen to music",s:"Sometimes that's enough",people:['Solo','Couple'],loc:['Nature','City'],cost:'Free',dur:'1 Hour',energy:'Lazy'},
+{t:"Read a book outside",s:'Books somehow hit different in nature',people:['Solo'],loc:['Nature'],cost:'Free',dur:'Half Day',energy:'Lazy'},
+{t:"Make the best hot chocolate you possibly can",s:"We're going for Michelin stars today",people:['Solo','Friends'],loc:['Home'],cost:'Under €5',dur:'30min',energy:'Lazy'},
+{t:"Try meditating for 10 minutes",s:'Your brain could use a coffee break',people:['Solo'],loc:['Home','Nature'],cost:'Free',dur:'15min',energy:'Lazy'},
+{t:"Stretch for 15 minutes",s:'Your back has been sending complaints',people:['Solo'],loc:['Home'],cost:'Free',dur:'15min',energy:'Lazy'},
+{t:"Watch the sunset and talk about life",s:'In all the chaos, a blink of calm',people:['Couple','Friends'],loc:['Nature'],cost:'Free',dur:'1 Hour',energy:'Lazy'},
+{t:"Go for a walk with no destination",s:'It\'s to appreciate the details around you',people:['Solo','Couple'],loc:['City','Nature'],cost:'Free',dur:'1 Hour',energy:'Chill'},
+{t:"Sit around a campfire",s:"It's kind of hypnotic",people:['Friends','Couple'],loc:['Nature'],cost:'Under €10',dur:'Evening',energy:'Lazy'},
+{t:"Pet an animal and forget about life for a bit",s:'They seem to have it figured out',people:['Solo','Couple'],loc:['Nature','City'],cost:'Free',dur:'30min',energy:'Lazy'},
+{t:"Find some bugs outside",s:'There is so much going on all around us',people:['Solo','Family'],loc:['Nature'],cost:'Free',dur:'30min',energy:'Lazy'},
+{t:"Make your own jewellery",s:'Just find a rock, shape it, string through it — easier than it seems',people:['Solo','Friends'],loc:['Home'],cost:'Under €5',dur:'Half Day',energy:'Lazy'},
+{t:"Visit a cozy café and order some tea or coffee",s:'Bring a book, a friend, or just stare at life happening around you',people:['Solo','Couple'],loc:['City'],cost:'Under €5',dur:'Half Day',energy:'Lazy'},
+{t:"Lie in the grass and watch the clouds",s:'Cloud engineers deserve recognition',people:['Solo','Couple'],loc:['Nature'],cost:'Free',dur:'30min',energy:'Lazy'},
+{t:"Make tea and just stare out the window",s:'Grandma energy. Embrace it',people:['Solo'],loc:['Home'],cost:'Under €5',dur:'15min',energy:'Lazy'},
+{t:"Take the longest shower known to mankind",s:'Ideas have been born here',people:['Solo'],loc:['Home'],cost:'Free',dur:'30min',energy:'Lazy'},
+{t:"Light a scented candle and turn off the lights",s:'Combine that with a movie, snacks and a warm drink',people:['Solo','Couple'],loc:['Home'],cost:'Under €10',dur:'Evening',energy:'Lazy'},
+{t:"Buy a plant",s:"Congratulations, you're responsible for a life now",people:['Solo','Couple'],loc:['City'],cost:'Under €10',dur:'1 Hour',energy:'Lazy'},
+{t:"Sit under a tree",s:'People used to call this an afternoon',people:['Solo','Couple'],loc:['Nature'],cost:'Free',dur:'Half Day',energy:'Lazy'},
+{t:"Listen to an album from start to finish",s:'No skipping. Trust the artist',people:['Solo'],loc:['Home','Nature'],cost:'Free',dur:'1 Hour',energy:'Lazy'},
+{t:"Buy an analog camera and take some photos",s:"Every photo counts, that's what makes it special",people:['Solo','Friends','Couple'],loc:['City','Nature'],cost:'Under €20',dur:'Half Day',energy:'Chill'},
+{t:"Bake something",s:'Your house deserves to smell amazing',people:['Solo','Friends'],loc:['Home'],cost:'Under €10',dur:'Half Day',energy:'Chill'},
+{t:"Eat breakfast outside",s:'The birds have been doing this forever',people:['Solo','Couple'],loc:['Nature'],cost:'Under €10',dur:'Morning',energy:'Lazy'},
+{t:"Do a puzzle together",s:'Your grandparents knew what they were doing',people:['Friends','Couple','Family'],loc:['Home'],cost:'Under €10',dur:'Half Day',energy:'Lazy'},
+{t:"Make something out of clay",s:'Elementary school vibes',people:['Solo','Friends'],loc:['Home'],cost:'Under €10',dur:'Half Day',energy:'Lazy'},
+{t:"Call someone you haven't talked to in a while",s:'Do not overthink. Just call them',people:['Solo'],loc:['Home'],cost:'Free',dur:'30min',energy:'Lazy'},
+{t:"Maybe you just need a nap",s:'No seriously',people:['Solo'],loc:['Home'],cost:'Free',dur:'1 Hour',energy:'Lazy'},
+{t:"Write a postcard to someone",s:'Very meaningful and very underrated',people:['Solo'],loc:['Home'],cost:'Under €5',dur:'30min',energy:'Lazy'},
+{t:"Movie night",s:'Popcorn, friends and a great movie',people:['Friends','Couple'],loc:['Home'],cost:'Under €10',dur:'Evening',energy:'Lazy'},
+{t:"Stargaze at a spot with no light pollution",s:'This is peak chill',people:['Friends','Couple','Solo'],loc:['Nature'],cost:'Free',dur:'Evening',energy:'Lazy'},
+{t:"Buy some drinks and find a chill spot",s:'An evergreen combo',people:['Friends','Couple'],loc:['Nature','City'],cost:'Under €10',dur:'Evening',energy:'Lazy'},
+{t:"Look through an old photo album",s:'Ah, the nostalgia',people:['Solo','Family'],loc:['Home'],cost:'Free',dur:'30min',energy:'Lazy'},
+{t:"Visit a bakery early in the morning",s:'Something about the smell just fixes people',people:['Solo','Couple'],loc:['City'],cost:'Under €5',dur:'Morning',energy:'Lazy'},
+{t:"Start a tiny herb garden",s:"Congratulations. You're basically a medieval healer now",people:['Solo'],loc:['Home'],cost:'Under €10',dur:'1 Hour',energy:'Lazy'},
+{t:"Rearrange your room or buy new decorations",s:'Sometimes your room needs character development too',people:['Solo'],loc:['Home'],cost:'Under €20',dur:'Half Day',energy:'Chill'},
+{t:"Put on headphones and listen to your favourite songs with your eyes closed",s:'Let the music take you somewhere else',people:['Solo'],loc:['Home','Nature'],cost:'Free',dur:'30min',energy:'Lazy'},
+{t:"Order way too much food and regret nothing",s:"Leftovers are tomorrow's problem",people:['Friends','Couple'],loc:['Home'],cost:'Under €20',dur:'Evening',energy:'Lazy'},
+{t:"Go for a late night drive",s:'No destination. Just vibes',people:['Friends','Couple','Solo'],loc:['Road Trip'],cost:'Under €10',dur:'Evening',energy:'Lazy'},
+{t:"Play board games",s:'They are actually still very fun',people:['Friends','Family'],loc:['Home'],cost:'Free',dur:'Half Day',energy:'Lazy'},
+{t:"Buy random snacks and rate them",s:'Democracy but for snacks',people:['Friends','Couple'],loc:['Home'],cost:'Under €10',dur:'1 Hour',energy:'Lazy'},
+{t:"Retro games night",s:'8-bit sounds and old memories',people:['Friends','Couple'],loc:['Home'],cost:'Free',dur:'Evening',energy:'Lazy'},
+{t:"Go for a walk and talk about life",s:'Therapy, but cheaper',people:['Friends','Couple'],loc:['City','Nature'],cost:'Free',dur:'1 Hour',energy:'Chill'},
+{t:"Play some video games with a friend",s:'Core childhood memories unlocked',people:['Friends'],loc:['Home'],cost:'Free',dur:'Half Day',energy:'Lazy'},
+{t:"Find a hammock spot and just exist for a while",s:'Horizontal is a valid life choice',people:['Solo','Couple'],loc:['Nature'],cost:'Free',dur:'Half Day',energy:'Lazy'},
+{t:"Cook a proper meal from scratch with no shortcuts",s:'Turns out your phone has recipes, not just doom',people:['Solo','Couple'],loc:['Home'],cost:'Under €20',dur:'Half Day',energy:'Chill'},
+{t:"Watch the rain from somewhere warm",s:'One of those simple things that just works',people:['Solo','Couple'],loc:['Home'],cost:'Free',dur:'30min',energy:'Lazy'},
+{t:"Write down everything that's on your mind",s:'No structure, no goal. Just get it out',people:['Solo'],loc:['Home'],cost:'Free',dur:'30min',energy:'Lazy'},
+{t:"Sit in a park and just people-watch",s:'Humans are fascinating when you stop being one of them',people:['Solo','Couple'],loc:['City'],cost:'Free',dur:'1 Hour',energy:'Lazy'},
+{t:"Make a playlist for a specific feeling",s:'Not a vibe. A very specific feeling at 11pm on a Tuesday',people:['Solo'],loc:['Home'],cost:'Free',dur:'30min',energy:'Lazy'},
+{t:"Find a field and just lie in it",s:'No agenda. No phone. Just sky',people:['Solo','Couple'],loc:['Nature'],cost:'Free',dur:'1 Hour',energy:'Lazy'},
+{t:"Do absolutely nothing and be okay with it",s:'Revolutionary concept',people:['Solo'],loc:['Home'],cost:'Free',dur:'Half Day',energy:'Lazy'}
+]},
+fun:{label:'Fun',emoji:'🎉',color:'#d47e1a',ideas:[
+{t:"Go to a karaoke bar",s:'The ones who say they can\'t sing always go the hardest',people:['Friends'],loc:['City'],cost:'Under €20',dur:'Evening',energy:'Active'},
+{t:"Go to an escape room",s:'If there are 4 you can pick a hidden impostor to sabotage your escape!',people:['Friends','Couple'],loc:['City'],cost:'Under €20',dur:'1 Hour',energy:'Chill'},
+{t:"Host a cooking competition at home",s:'Gordon Ramsay energy, student budget ingredients',people:['Friends'],loc:['Home'],cost:'Under €20',dur:'Half Day',energy:'Active'},
+{t:"Do a pub quiz",s:'That one friend who knows random facts finally gets to shine',people:['Friends'],loc:['City'],cost:'Under €10',dur:'Evening',energy:'Lazy'},
+{t:"Play mini golf",s:'Surprisingly competitive. Someone will take it too seriously',people:['Friends','Couple','Family'],loc:['City'],cost:'Under €10',dur:'1 Hour',energy:'Chill'},
+{t:"Play beer pong",s:'The rules are simple. The consequences are not',people:['Friends'],loc:['Home'],cost:'Under €10',dur:'Evening',energy:'Active'},
+{t:"Play truth or dare",s:'The questions can be pretty bad',people:['Friends'],loc:['Home'],cost:'Free',dur:'Evening',energy:'Chill'},
+{t:"Host a campfire night and cook some food",s:'Bonus points for guitar players',people:['Friends','Family'],loc:['Nature'],cost:'Under €10',dur:'Evening',energy:'Chill'},
+{t:"Race with shopping carts",s:'We were just borrowing them!',people:['Friends'],loc:['City'],cost:'Free',dur:'30min',energy:'High Energy'},
+{t:"Host a PowerPoint night",s:'The topics can be as deluded as you want',people:['Friends'],loc:['Home'],cost:'Free',dur:'Evening',energy:'Lazy'},
+{t:"Mouth filled with water — you laugh you lose",s:'Sit face to face and die laughing',people:['Friends','Couple'],loc:['Home'],cost:'Free',dur:'30min',energy:'Lazy'},
+{t:"Make your own go-karts and race with them",s:"It's basically human Mario Kart",people:['Friends'],loc:['Outdoors'],cost:'Under €20',dur:'Half Day',energy:'High Energy'},
+{t:"You have 15 minutes — find the weirdest thing for under €10",s:'No rules. No limits. No refunds',people:['Friends'],loc:['City'],cost:'Under €10',dur:'30min',energy:'Active'},
+{t:"Blindfold taste test",s:'Coke vs Pepsi wars begin today',people:['Friends','Couple'],loc:['Home'],cost:'Under €10',dur:'1 Hour',energy:'Lazy'},
+{t:"Water balloon war",s:'The Geneva Convention says nothing about this',people:['Friends','Family'],loc:['Outdoors'],cost:'Under €10',dur:'1 Hour',energy:'High Energy'},
+{t:"Paintball",s:'Everybody becomes John Wick for an hour and gets a lot of bruises',people:['Friends'],loc:['City','Nature'],cost:'Under €50',dur:'Half Day',energy:'High Energy'},
+{t:"Theme night!",s:'Cowboys? Mafia? Hawaiian shirts? Sky is the limit!',people:['Friends'],loc:['Home'],cost:'Under €20',dur:'Evening',energy:'Chill'},
+{t:"Build paper airplanes and compete",s:'Aerospace engineers start somewhere',people:['Friends','Family'],loc:['Home','Outdoors'],cost:'Free',dur:'1 Hour',energy:'Lazy'},
+{t:"Board game night",s:'Friendships are temporary. Victory is forever',people:['Friends','Family'],loc:['Home'],cost:'Under €10',dur:'Evening',energy:'Lazy'},
+{t:"Build something stupid together",s:'Maximum creativity. Minimum engineering',people:['Friends'],loc:['Home'],cost:'Under €10',dur:'Half Day',energy:'Active'},
+{t:"Decide for each other what to wear and actually wear it in public",s:'Also a great punishment for losing a challenge',people:['Friends'],loc:['City'],cost:'Free',dur:'Half Day',energy:'Chill'},
+{t:"Host a cocktail night",s:'The hardest part is finding the ingredients',people:['Friends'],loc:['Home'],cost:'Under €20',dur:'Evening',energy:'Chill'},
+{t:"Everybody brings one mystery ingredient and you cook with all of them",s:'No veto rights. No complaints',people:['Friends'],loc:['Home'],cost:'Under €20',dur:'Half Day',energy:'Active'},
+{t:"Go to the arcade",s:'Your wallet is weaker than your inner child',people:['Friends','Couple','Family'],loc:['City'],cost:'Under €20',dur:'Half Day',energy:'Active'},
+{t:"Everyone gets one random object and must sell it within an hour",s:'Shark Tank energy',people:['Friends'],loc:['Home','City'],cost:'Free',dur:'1 Hour',energy:'Active'},
+{t:"Rock paper scissors — losers get a challenge picked by everyone else",s:'This is how gambling addictions start',people:['Friends'],loc:['Home'],cost:'Free',dur:'30min',energy:'Lazy'},
+{t:"Find a free event happening in your city and crash it",s:"Art opening, book launch, wine tasting — they're everywhere and nobody checks",people:['Friends','Solo'],loc:['City'],cost:'Free',dur:'Half Day',energy:'Chill'},
+{t:"Everybody orders food for the person on their left",s:'Trust issues included',people:['Friends'],loc:['Home','City'],cost:'Under €20',dur:'Half Day',energy:'Lazy'},
+{t:"Buy drinks and snacks you've never tried and rank them",s:'Some countries owe apologies',people:['Friends','Couple'],loc:['Home'],cost:'Under €20',dur:'1 Hour',energy:'Lazy'},
+{t:"Have a mukbang at a fast food restaurant",s:'Or bring the food to a spot that actually slaps',people:['Friends'],loc:['City','Nature'],cost:'Under €20',dur:'Half Day',energy:'Lazy'},
+{t:"Go to a thrift shop and find some cool clothes",s:'Grandmas and grandpas had some serious drip',people:['Friends','Couple'],loc:['City'],cost:'Under €10',dur:'Half Day',energy:'Chill'},
+{t:"Be fashion designers for each other",s:'You can actually try to give good advice here',people:['Friends','Couple'],loc:['Home'],cost:'Free',dur:'1 Hour',energy:'Lazy'},
+{t:"Take a day trip — pick any location",s:'No overthinking. Just go',people:['Friends','Couple'],loc:['Road Trip'],cost:'Under €20',dur:'Full Day',energy:'Chill'},
+{t:"Explore a cool place with bikes only",s:'Childhood memories here we come',people:['Friends','Couple','Family'],loc:['City','Nature'],cost:'Free',dur:'Half Day',energy:'Active'},
+{t:"Play hide and seek but the seeker has water balloons",s:'Full of adrenaline, full of laughs',people:['Friends','Family'],loc:['Outdoors'],cost:'Under €10',dur:'1 Hour',energy:'High Energy'},
+{t:"Play Among Us IRL",s:'Spread tasks across the house, murderer kills by tapping you twice',people:['Friends'],loc:['Home'],cost:'Free',dur:'1 Hour',energy:'Active'},
+{t:"Have a picnic and bring some card games",s:'Simple and effective',people:['Friends','Couple','Family'],loc:['Nature'],cost:'Under €10',dur:'Half Day',energy:'Lazy'},
+{t:"Have a BBQ party",s:'Great food and even greater friends',people:['Friends','Family'],loc:['Outdoors'],cost:'Under €20',dur:'Half Day',energy:'Chill'},
+{t:"Everybody gets €5 and buys a mystery gift for someone else",s:'The thought counts. Allegedly',people:['Friends'],loc:['City'],cost:'Under €10',dur:'Half Day',energy:'Chill'},
+{t:"Seek for geodes or other natural treasures",s:'The earth has been hiding things. Time to find them',people:['Friends','Family','Solo'],loc:['Nature'],cost:'Free',dur:'Half Day',energy:'Active'},
+{t:"Drive somewhere absurdly far for one specific food item",s:'Two hours for nuggets? Absolutely',people:['Friends','Couple'],loc:['Road Trip'],cost:'Under €20',dur:'Full Day',energy:'Chill'},
+{t:"Hide 100 tiny objects around a friend's house without them knowing",s:'Months later they will still be finding them',people:['Friends'],loc:['Home'],cost:'Free',dur:'1 Hour',energy:'Lazy'}
+]},
+romantic:{label:'Romantic',emoji:'❤️',color:'#b03060',ideas:[
+{t:"Massage each other",s:'No special skills needed, just good intentions',people:['Couple'],loc:['Home'],cost:'Free',dur:'30min',energy:'Lazy'},
+{t:"Ice cream date",s:'Simple, sweet, never fails',people:['Couple'],loc:['City'],cost:'Under €10',dur:'1 Hour',energy:'Chill'},
+{t:"Grab a picnic blanket and find a romantic spot to chill",s:'Snacks, sunshine, and zero plans',people:['Couple'],loc:['Nature'],cost:'Under €10',dur:'Half Day',energy:'Lazy'},
+{t:"Make a necklace or bracelet for your SO",s:'Handmade beats store-bought every time',people:['Couple'],loc:['Home'],cost:'Under €10',dur:'1 Hour',energy:'Lazy'},
+{t:"Bake them something",s:'The smell of effort is underrated',people:['Couple'],loc:['Home'],cost:'Under €10',dur:'Half Day',energy:'Chill'},
+{t:"Take them on a surprise date",s:'Plan everything. Reveal nothing',people:['Couple'],loc:['Anywhere'],cost:'Varies',dur:'Half Day',energy:'Chill'},
+{t:"Learn constellations and watch the stars together",s:'Suddenly the sky means something',people:['Couple'],loc:['Nature'],cost:'Free',dur:'Evening',energy:'Lazy'},
+{t:"Art date — draw, paint or work with clay",s:"You'll both be bad at it. That's the fun part",people:['Couple'],loc:['Home','City'],cost:'Under €20',dur:'Half Day',energy:'Chill'},
+{t:"Take them where you first met and reminisce",s:'Full circle moments hit different',people:['Couple'],loc:['Anywhere'],cost:'Free',dur:'Half Day',energy:'Chill'},
+{t:"Surprise them with a small gift today",s:"No occasion needed. That's what makes it good",people:['Couple'],loc:['Anywhere'],cost:'Under €10',dur:'30min',energy:'Chill'},
+{t:"Take them to their favorite restaurant",s:'Sometimes the classics just work',people:['Couple'],loc:['City'],cost:'Under €50',dur:'Half Day',energy:'Chill'},
+{t:"Cook a full meal together from scratch",s:"Pick a cuisine neither of you has tried before",people:['Couple'],loc:['Home'],cost:'Under €20',dur:'Half Day',energy:'Chill'},
+{t:"Recreate your first date as closely as possible",s:'Same place, same order, same energy',people:['Couple'],loc:['Anywhere'],cost:'Varies',dur:'Half Day',energy:'Chill'},
+{t:"Find the highest point near your city and watch the sunset",s:'The view is better with someone next to you',people:['Couple'],loc:['Nature','City'],cost:'Free',dur:'Evening',energy:'Chill'},
+{t:"Pick them flowers and make a bouquet",s:'Wildflowers count. Effort is the gift',people:['Couple'],loc:['Nature'],cost:'Free',dur:'30min',energy:'Chill'},
+{t:"Go somewhere nice with bicycles",s:'Getting lost together is a love language',people:['Couple'],loc:['City','Nature'],cost:'Free',dur:'Half Day',energy:'Active'},
+{t:"Read to each other",s:"Pick a book. Take turns. It's incredibly intimate for no obvious reason",people:['Couple'],loc:['Home'],cost:'Free',dur:'1 Hour',energy:'Lazy'},
+{t:"Do a spa night at home",s:'Candles, face masks, the whole thing. No irony',people:['Couple'],loc:['Home'],cost:'Under €20',dur:'Evening',energy:'Lazy'},
+{t:"Have a lazy date",s:'Watch a movie, order your favorite food and chill',people:['Couple'],loc:['Home'],cost:'Under €20',dur:'Evening',energy:'Lazy'},
+{t:"Dress up and go to a jazz bar",s:'Smooth jazz for a smooth duo',people:['Couple'],loc:['City'],cost:'Under €20',dur:'Evening',energy:'Chill'},
+{t:"Take them on a mystery trip",s:'Could be anything. The anticipation is what matters',people:['Couple'],loc:['Anywhere'],cost:'Varies',dur:'Full Day',energy:'Active'},
+{t:"IKEA date",s:'Comfy furniture and Swedish meatballs',people:['Couple'],loc:['City'],cost:'Under €20',dur:'Half Day',energy:'Chill'},
+{t:"Take a long drive with the windows down and listen to music",s:'Insane main character vibe',people:['Couple'],loc:['Road Trip'],cost:'Free',dur:'1 Hour',energy:'Chill'},
+{t:"Go for a late night swim somewhere",s:'The world gets quiet after midnight',people:['Couple'],loc:['Nature'],cost:'Free',dur:'Evening',energy:'Active'},
+{t:"Start an album together",s:'One day you will look back and say damn, we looked fine',people:['Couple'],loc:['Home'],cost:'Free',dur:'Ongoing',energy:'Lazy'},
+{t:"Go to a museum or art gallery together",s:'Best human creations all in one place, aside from you two',people:['Couple'],loc:['City'],cost:'Under €10',dur:'Half Day',energy:'Chill'},
+{t:"Take them somewhere from their childhood they haven't been back to",s:'The nostalgia hits in ways neither of you expects',people:['Couple'],loc:['Anywhere'],cost:'Varies',dur:'Half Day',energy:'Chill'},
+{t:"Read a book in nature together",s:'So peaceful and romantic',people:['Couple'],loc:['Nature'],cost:'Free',dur:'Half Day',energy:'Lazy'},
+{t:"Ask them what they've always wanted to do and do it today",s:'Be ready for anything',people:['Couple'],loc:['Anywhere'],cost:'Varies',dur:'Full Day',energy:'Active'},
+{t:"Make each other gifts with €5 only",s:'Creativity and love do the heavy lifting',people:['Couple'],loc:['Home'],cost:'Under €5',dur:'1 Hour',energy:'Chill'},
+{t:"Ask each other 36 questions that make people fall in love",s:'Apparently science got involved',people:['Couple'],loc:['Home'],cost:'Free',dur:'1 Hour',energy:'Lazy'},
+{t:"Sit under the stars and talk about life",s:'No rush. No pressure',people:['Couple'],loc:['Nature'],cost:'Free',dur:'Evening',energy:'Lazy'},
+{t:"Write letters to each other",s:'Old-school romance never died',people:['Couple'],loc:['Home'],cost:'Free',dur:'30min',energy:'Lazy'},
+{t:"Slow dance to your favorite song",s:'It is very simple but very effective',people:['Couple'],loc:['Home'],cost:'Free',dur:'15min',energy:'Lazy'},
+{t:"Give each other disposable cameras for the day",s:'No deleting. No filters',people:['Couple'],loc:['Anywhere'],cost:'Under €20',dur:'Full Day',energy:'Active'},
+{t:"Create a time capsule together",s:'Open it in 5 years. Future you is curious',people:['Couple'],loc:['Home'],cost:'Under €10',dur:'1 Hour',energy:'Lazy'},
+{t:"Learn something together — cooking, pottery, a language",s:"It's more fun being bad at something together",people:['Couple'],loc:['Home','City'],cost:'Under €20',dur:'Half Day',energy:'Chill'},
+{t:"Revisit your oldest messages",s:'Good luck surviving the cringe',people:['Couple'],loc:['Home'],cost:'Free',dur:'30min',energy:'Lazy'},
+{t:"Buy a plant together and name it",s:'They grow up so fast',people:['Couple'],loc:['City'],cost:'Under €10',dur:'1 Hour',energy:'Chill'},
+{t:"Plan a trip together",s:"Cheap or expensive, 1 day or 1 month, as long as you're together",people:['Couple'],loc:['Home'],cost:'Free',dur:'1 Hour',energy:'Chill'},
+{t:"Buy each other clothes or accessories you'd love to see on them",s:'Keep an open mind… and an open wallet',people:['Couple'],loc:['City'],cost:'Under €50',dur:'Half Day',energy:'Chill'},
+{t:"Buy a Lego set and build it together",s:"Everything is cool when you're part of the team",people:['Couple'],loc:['Home'],cost:'Under €20',dur:'Half Day',energy:'Lazy'}
+]},
+party:{label:'Party',emoji:'🍻',color:'#b8860b',ideas:[
+{t:"Beer pong tournament with a real bracket",s:'Seedings, trophy, the works',people:['Friends'],loc:['Home'],cost:'Under €10',dur:'Evening',energy:'Active'},
+{t:"Spin the bottle",s:'The classic exists for a reason',people:['Friends'],loc:['Home'],cost:'Free',dur:'Evening',energy:'Lazy'},
+{t:"Truth or dare",s:'The dares get worse as the night goes on',people:['Friends'],loc:['Home'],cost:'Free',dur:'Evening',energy:'Chill'},
+{t:"Suck and blow",s:'This is how relationships start and end',people:['Friends'],loc:['Home'],cost:'Free',dur:'30min',energy:'Active'},
+{t:"Never have I ever",s:"You will learn things about your friends you can't unlearn",people:['Friends'],loc:['Home'],cost:'Free',dur:'Evening',energy:'Lazy'},
+{t:"Flip cup relay",s:'Speed matters more than dignity',people:['Friends'],loc:['Home'],cost:'Under €10',dur:'Evening',energy:'Active'},
+{t:"Kings cup",s:'One deck of cards, infinite chaos',people:['Friends'],loc:['Home'],cost:'Under €10',dur:'Evening',energy:'Active'},
+{t:"Most likely to",s:'The accusations get personal fast',people:['Friends'],loc:['Home'],cost:'Free',dur:'Evening',energy:'Lazy'},
+{t:"Blind cocktail tasting",s:'Guess the ingredients, lose spectacularly',people:['Friends'],loc:['Home','City'],cost:'Under €20',dur:'Evening',energy:'Lazy'},
+{t:"Make up your own cocktail and name it",s:"Bonus points if it's actually drinkable",people:['Friends'],loc:['Home'],cost:'Under €20',dur:'Evening',energy:'Chill'},
+{t:"Beer pong but loser does a punishment, not just drinks",s:'Raise the stakes',people:['Friends'],loc:['Home'],cost:'Under €10',dur:'Evening',energy:'Active'},
+{t:"Cheap wine ranking — everyone brings a bottle under €10",s:'Democracy in wine form',people:['Friends'],loc:['Home'],cost:'Under €10',dur:'Evening',energy:'Lazy'},
+{t:"Two truths and a lie, drunk edition",s:'Honesty levels rise with the night',people:['Friends'],loc:['Home'],cost:'Free',dur:'Evening',energy:'Lazy'},
+{t:"Musical chairs but with shots involved",s:'Adult version, same chaos',people:['Friends'],loc:['Home'],cost:'Under €10',dur:'Evening',energy:'Active'},
+{t:"Charades but the whole team has to act it out",s:'Group embarrassment is more fun',people:['Friends'],loc:['Home'],cost:'Free',dur:'Evening',energy:'Active'},
+{t:"Drinking jenga — write a rule on every block",s:"The tower falls, the rules don't",people:['Friends'],loc:['Home'],cost:'Under €10',dur:'Evening',energy:'Active'},
+{t:"Power hour — one shot every minute for 60 minutes",s:'Not for beginners',people:['Friends'],loc:['Home'],cost:'Under €20',dur:'Evening',energy:'High Energy'},
+{t:"Card against humanity but loser drinks",s:'Comedy meets consequences',people:['Friends'],loc:['Home'],cost:'Free',dur:'Evening',energy:'Lazy'},
+{t:"Body shots off a friend",s:'Tequila makes everyone brave',people:['Friends'],loc:['Home'],cost:'Under €10',dur:'Evening',energy:'Active'},
+{t:"Freeze dance — last one moving when music stops drinks",s:'Childhood game, adult stakes',people:['Friends'],loc:['Home'],cost:'Free',dur:'Evening',energy:'Active'},
+{t:"Categories game — name something in 5 seconds or drink",s:'The pressure gets people every time',people:['Friends'],loc:['Home'],cost:'Free',dur:'Evening',energy:'Active'},
+{t:"Drunk Jenga but blocks have dares written on them",s:'Towers fall, secrets spill',people:['Friends'],loc:['Home'],cost:'Under €10',dur:'Evening',energy:'Active'},
+{t:"Spinning wheel of random shots",s:'Let chaos pick your night',people:['Friends'],loc:['Home'],cost:'Under €20',dur:'Evening',energy:'Active'},
+{t:"Whoever loses rock paper scissors does a shot",s:'Best of three escalates fast',people:['Friends'],loc:['Home'],cost:'Free',dur:'Evening',energy:'Active'},
+{t:"Karaoke but you drink based on how bad the song was",s:'Self-awareness is rewarded',people:['Friends'],loc:['City'],cost:'Under €20',dur:'Evening',energy:'Active'},
+{t:"Bartender for a night — everyone takes turns mixing drinks blind",s:'Trust is optional',people:['Friends'],loc:['Home'],cost:'Under €20',dur:'Evening',energy:'Lazy'},
+{t:"Drink the same thing the bartender recommends, no menu reading",s:'Surprise yourself',people:['Friends'],loc:['City'],cost:'Under €20',dur:'Evening',energy:'Chill'},
+{t:"Mystery shot roulette — one shot is something weird, nobody knows which",s:'Russian roulette but with vodka',people:['Friends'],loc:['Home'],cost:'Under €10',dur:'Evening',energy:'Active'},
+{t:"Last one to finish their drink does a dare",s:'Speed has consequences',people:['Friends'],loc:['Home'],cost:'Free',dur:'Evening',energy:'Active'},
+{t:"Truth or shot — answer honestly or take the shot",s:'Most people choose the shot',people:['Friends'],loc:['Home'],cost:'Free',dur:'Evening',energy:'Lazy'},
+{t:"Categories drinking game — movies, songs, countries, go around the circle",s:'First to mess up drinks',people:['Friends'],loc:['Home'],cost:'Free',dur:'Evening',energy:'Active'},
+{t:"Pass the shot — everyone takes one without spilling, loser refills",s:'Steady hands required',people:['Friends'],loc:['Home'],cost:'Under €10',dur:'Evening',energy:'Active'},
+{t:"Drunk texting roulette — everyone reads their oldest unsent draft out loud",s:'The cringe is the entertainment',people:['Friends'],loc:['Home'],cost:'Free',dur:'Evening',energy:'Lazy'},
+{t:"Beer Olympics — multiple drinking games, scored like real sports",s:'Gold medal, zero dignity',people:['Friends'],loc:['Home','Outdoors'],cost:'Under €20',dur:'Evening',energy:'High Energy'},
+{t:"Champagne tower, even a small one",s:'Physics and alcohol, what could go wrong',people:['Friends'],loc:['Home'],cost:'Under €20',dur:'Evening',energy:'Active'},
+{t:"Themed cocktail night — 80s, tiki, decades, pick a universe",s:'Dress the part too',people:['Friends'],loc:['Home'],cost:'Under €20',dur:'Evening',energy:'Active'},
+{t:"Blind taste test — cheap vs expensive alcohol, guess which is which",s:'Your palate is about to be humbled',people:['Friends'],loc:['Home'],cost:'Under €50',dur:'Evening',energy:'Lazy'},
+{t:"Truth booth — one person answers anything for 2 minutes straight",s:'No topic is off limits',people:['Friends'],loc:['Home'],cost:'Free',dur:'Evening',energy:'Lazy'},
+{t:"Shotgun a beer race",s:'Speed and technique both matter',people:['Friends'],loc:['Home','Outdoors'],cost:'Under €10',dur:'30min',energy:'High Energy'},
+{t:"Drink and draw — everyone draws the person to their left after each round",s:'Skills decline as the night goes on',people:['Friends'],loc:['Home'],cost:'Free',dur:'Evening',energy:'Lazy'},
+{t:"The floor is lava but you're holding a drink",s:'Balance under pressure',people:['Friends'],loc:['Home'],cost:'Free',dur:'Evening',energy:'Active'},
+{t:"Photo booth challenge — funniest photo each round wins, loser drinks",s:'Document the chaos',people:['Friends'],loc:['Home'],cost:'Free',dur:'Evening',energy:'Active'},
+{t:"Drink based on a movie's drinking game rules",s:'Pick any film with a cult following',people:['Friends'],loc:['Home'],cost:'Under €10',dur:'Evening',energy:'Lazy'},
+{t:'Last person to text someone "hey" with no context reads the reply out loud',s:'The replies are always better than expected',people:['Friends'],loc:['Home'],cost:'Free',dur:'30min',energy:'Lazy'},
+{t:"Slow dance battle, judged by everyone else",s:'Winner picks the next game',people:['Friends'],loc:['Home'],cost:'Free',dur:'Evening',energy:'Active'},
+{t:"Mix random shots from everyone's choice and one person has to drink it",s:'A true test of friendship',people:['Friends'],loc:['Home'],cost:'Under €10',dur:'Evening',energy:'Active'},
+{t:"Toast roulette — everyone gives an actual toast about someone in the room",s:'No cheers, real words',people:['Friends'],loc:['Home'],cost:'Free',dur:'Evening',energy:'Lazy'},
+{t:"Drunk minute to win it — silly physical challenges, loser drinks",s:'Chaos, but timed',people:['Friends'],loc:['Home'],cost:'Free',dur:'Evening',energy:'Active'},
+{t:"End the night with everyone sharing one good thing about the night",s:'Bring it back down before bed',people:['Friends'],loc:['Home'],cost:'Free',dur:'15min',energy:'Lazy'}
+]},
+crazy:{label:'Crazy',emoji:'🤡',color:'#a0306e',ideas:[
+{t:"Get a tattoo done today",s:'Would you dare a friend picking one for you?',people:['Solo','Friends'],loc:['City'],cost:'Under €50',dur:'Half Day',energy:'Chill'},
+{t:"Get a piercing done today",s:'Bonus points for people with no piercings yet',people:['Solo','Friends'],loc:['City'],cost:'Under €20',dur:'30min',energy:'Chill'},
+{t:"Buy a ticket to another country and leave today",s:'Solo or with the gang, this will be one heck of a story',people:['Solo','Friends','Couple'],loc:['Road Trip'],cost:'Under €50',dur:'Multiple Days',energy:'Active'},
+{t:"Skinny dipping in the dark",s:'Katy Perry had it figured out',people:['Friends','Couple'],loc:['Nature'],cost:'Free',dur:'Evening',energy:'Active'},
+{t:"Dye your hair",s:'If you have been thinking about it, now is the time to do it!',people:['Solo','Friends'],loc:['Home','City'],cost:'Under €20',dur:'Half Day',energy:'Chill'},
+{t:"Go into a karaoke, but a friend picks a song for you",s:'Neaaar… FAaAaR…. wherEVeEeeEEER *dies*',people:['Friends'],loc:['City'],cost:'Under €20',dur:'Evening',energy:'Active'},
+{t:"Give one mentally unstable friend complete control over the day",s:'Trust is about to be tested',people:['Friends'],loc:['Anywhere'],cost:'Varies',dur:'Full Day',energy:'Active'},
+{t:"Stay awake and go watch the sunrise somewhere random",s:'No sleep. No regrets',people:['Friends','Couple','Solo'],loc:['Nature'],cost:'Free',dur:'Morning',energy:'Active'},
+{t:"Find the coldest river possible and jump in",s:'Everybody acts tough until the first toe enters',people:['Friends'],loc:['Nature'],cost:'Free',dur:'30min',energy:'High Energy'},
+{t:"Whoever loses rock paper scissors has to do one thing everyone is scared of",s:'Character development',people:['Friends'],loc:['Anywhere'],cost:'Varies',dur:'Varies',energy:'Active'},
+{t:"Buy an extra ticket to an event and convince a stranger to tag along",s:'Worst they can say is no',people:['Solo'],loc:['City'],cost:'Under €50',dur:'Half Day',energy:'Chill'},
+{t:"Wear something you've never had the confidence to wear",s:'The outfit has been waiting. The moment is now',people:['Solo','Friends'],loc:['City'],cost:'Free',dur:'Full Day',energy:'Chill'},
+{t:"Sleep in a completely different city tonight with no pre-booked accommodation",s:'Figure it out when you get there',people:['Solo','Friends'],loc:['City'],cost:'Under €50',dur:'Multiple Days',energy:'Active'},
+{t:"Go to an airport, pick a destination when you get there",s:'Now this is true uncle lore',people:['Solo','Friends'],loc:['Road Trip'],cost:'Expensive',dur:'Multiple Days',energy:'Active'},
+{t:"Truth or dare in public",s:'You can play with a skip, use it wisely…',people:['Friends'],loc:['City'],cost:'Free',dur:'1 Hour',energy:'Active'},
+{t:"Sneak into an event",s:'This is not a life advice. Do it at your own risk',people:['Friends','Solo'],loc:['City'],cost:'Free',dur:'Half Day',energy:'Active'},
+{t:"Tell someone something you've been meaning to say for a long time",s:'You know exactly who. You know exactly what',people:['Solo'],loc:['Anywhere'],cost:'Free',dur:'30min',energy:'Chill'},
+{t:"Apply for something you think you're not ready for",s:'The rejection is also an answer. Apply anyway',people:['Solo'],loc:['Home'],cost:'Free',dur:'1 Hour',energy:'Lazy'},
+{t:"Pick a discipline, whoever loses shaves their head",s:"Don't worry, hair grows back",people:['Friends'],loc:['Anywhere'],cost:'Free',dur:'Varies',energy:'Active'},
+{t:"Introduce yourself to every single person at the next event you go to",s:'Every. Single. One',people:['Solo','Friends'],loc:['City'],cost:'Varies',dur:'Evening',energy:'Active'},
+{t:"Book a one-way train ticket to anywhere and figure out the return later",s:'Get your backpacks ready, we are going… where exactly?',people:['Solo','Friends'],loc:['Road Trip'],cost:'Under €20',dur:'Full Day',energy:'Active'},
+{t:"Invite a celebrity to your hangout or out for a drink",s:'Worst they can say is no',people:['Solo','Friends'],loc:['City'],cost:'Free',dur:'1 Hour',energy:'Chill'},
+{t:"Go to a job interview for a job you don't actually want",s:'Practice lying confidently. Dress well',people:['Solo'],loc:['City'],cost:'Free',dur:'Half Day',energy:'Chill'},
+{t:"Spend an entire day saying yes to everything anyone asks",s:'Set absolutely no boundaries and report back',people:['Solo','Friends'],loc:['Anywhere'],cost:'Varies',dur:'Full Day',energy:'Active'},
+{t:"Do the thing you've been scared to do for months",s:'You already know what it is',people:['Solo'],loc:['Anywhere'],cost:'Varies',dur:'Varies',energy:'Varies'},
+{t:"Go busking with zero musical ability",s:'A hat, a corner, and absolutely no shame',people:['Friends','Solo'],loc:['City'],cost:'Free',dur:'Half Day',energy:'Active'}
+]}
+};
+
+let activeCat = null;
+let filters = {people:[],loc:[],cost:[],dur:[],energy:[]};
+
+const FILTER_DEFS = {
+  people:{label:'Ljudje',opts:['Solo','Couple','Friends','Family']},
+  loc:{label:'Lokacija',opts:['Home','City','Nature','Road Trip','Outdoors']},
+  cost:{label:'Cena',opts:['Free','Under €10','Under €20','Under €50','Expensive']},
+  dur:{label:'Trajanje',opts:['15min','30min','1 Hour','Half Day','Full Day','Evening','Multiple Days']},
+  energy:{label:'Energija',opts:['Lazy','Chill','Active','High Energy']}
+};
+
+function renderCats(){
+  const row = document.getElementById('catsRow');
+  row.innerHTML='';
+  Object.keys(DATA).forEach(key=>{
+    const cat = DATA[key];
+    const chip = document.createElement('div');
+    chip.className='cat-chip'+(activeCat===key?' active':'');
+    if(activeCat===key){chip.style.background=cat.color;chip.style.borderColor=cat.color;}
+    chip.innerHTML=`${cat.emoji} ${cat.label}`;
+    chip.onclick=()=>selectCat(key);
+    row.appendChild(chip);
+  });
+}
+
+function selectCat(key){
+  activeCat = activeCat===key?null:key;
+  document.getElementById('btnMain').disabled = !activeCat;
+  renderCats();
+  updateCount();
+  if(!activeCat){
+    document.getElementById('resultZone').innerHTML='<div class="empty"><div class="empty-txt">izberi kategorijo<br>ali pritisni Random</div></div>';
+  }
+}
+
+function matchesFilters(idea){
+  if(filters.people.length && !idea.people.some(p=>filters.people.includes(p))) return false;
+  if(filters.loc.length && !idea.loc.some(l=>filters.loc.includes(l))) return false;
+  if(filters.cost.length && !filters.cost.includes(idea.cost)) return false;
+  if(filters.dur.length && !filters.dur.includes(idea.dur)) return false;
+  if(filters.energy.length && !filters.energy.includes(idea.energy)) return false;
+  return true;
+}
+
+function getFilteredIdeas(key){
+  return DATA[key].ideas.filter(matchesFilters);
+}
+
+function updateCount(){
+  const total = Object.values(filters).reduce((a,f)=>a+f.length,0);
+  const fc = document.getElementById('fcount');
+  fc.style.display = total>0?'flex':'none';
+  fc.textContent = total;
+
+  if(activeCat){
+    const n = getFilteredIdeas(activeCat).length;
+    document.getElementById('resultCount').textContent = n+' idej ustreza filtru';
+  } else {
+    document.getElementById('resultCount').textContent = 'izberi kategorijo ali pritisni random';
+  }
+}
+
+function rollIdea(forceKey){
+  const key = forceKey||activeCat;
+  if(!key) return;
+  const pool = getFilteredIdeas(key);
+  if(pool.length===0){
+    document.getElementById('resultZone').innerHTML='<div class="empty"><div class="empty-txt">Nobena ideja ne ustreza filtrom<br>Poskusi počistiti filtre</div></div>';
+    return;
+  }
+  const cat = DATA[key];
+  const idea = pool[Math.floor(Math.random()*pool.length)];
+  document.getElementById('resultZone').innerHTML=`
+    <div class="card" id="rcard">
+      <span class="card-badge" style="background:${cat.color}25;color:${cat.color}">${cat.emoji} ${cat.label}</span>
+      <div class="card-title">${idea.t}</div>
+      <div class="card-sub">${idea.s||''}</div>
+      <div class="tag-row">
+        ${idea.people.map(p=>`<span class="tag">${p}</span>`).join('')}
+        ${idea.loc.map(l=>`<span class="tag">${l}</span>`).join('')}
+        <span class="tag">${idea.cost}</span>
+        <span class="tag">${idea.dur}</span>
+      </div>
+    </div>`;
+  const c = document.getElementById('rcard');
+  c.style.animation='none';void c.offsetWidth;c.style.animation='popIn .35s cubic-bezier(.34,1.4,.64,1) both';
+}
+
+function surpriseMe(){
+  const keys = Object.keys(DATA).filter(k=>getFilteredIdeas(k).length>0);
+  if(keys.length===0){
+    document.getElementById('resultZone').innerHTML='<div class="empty"><div class="empty-txt">Nobena ideja ne ustreza filtrom</div></div>';
+    return;
+  }
+  const key = keys[Math.floor(Math.random()*keys.length)];
+  activeCat = key;
+  document.getElementById('btnMain').disabled=false;
+  renderCats();
+  updateCount();
+  rollIdea(key);
+}
+
+function openFilters(){
+  const container = document.getElementById('filterGroups');
+  container.innerHTML='';
+  Object.keys(FILTER_DEFS).forEach(fkey=>{
+    const def = FILTER_DEFS[fkey];
+    const group = document.createElement('div');
+    group.className='filter-group';
+    group.innerHTML=`<div class="filter-label">${def.label}</div><div class="opt-grid" id="grp-${fkey}"></div>`;
+    container.appendChild(group);
+    const grid = group.querySelector('.opt-grid');
+    def.opts.forEach(opt=>{
+      const btn = document.createElement('div');
+      btn.className='opt'+(filters[fkey].includes(opt)?' sel':'');
+      btn.textContent=opt;
+      btn.onclick=()=>{
+        if(filters[fkey].includes(opt)){
+          filters[fkey]=filters[fkey].filter(x=>x!==opt);
+          btn.classList.remove('sel');
+        } else {
+          filters[fkey].push(opt);
+          btn.classList.add('sel');
+        }
+        updateCount();
+      };
+      grid.appendChild(btn);
+    });
+  });
+  document.getElementById('filterOverlay').classList.add('open');
+}
+
+function closeFilters(){
+  document.getElementById('filterOverlay').classList.remove('open');
+  updateCount();
+}
+function closeFiltersBg(e){
+  if(e.target===document.getElementById('filterOverlay')) closeFilters();
+}
+function clearFilters(){
+  Object.keys(filters).forEach(k=>filters[k]=[]);
+  openFilters();
+  updateCount();
+}
+
+renderCats();
+updateCount();
+</script>
