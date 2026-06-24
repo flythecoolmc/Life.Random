@@ -1,3 +1,25 @@
+const CAT_BG = {
+  adventure:'adventure', chill:'rain', fun:'fun',
+  romantic:'romantic', party:'party', crazy:'crazy',
+  selfimprovement:'selfimprovement'
+};
+
+
+const TITLES = [
+  "What's the vibe today?","What mood are we feeling?","What kind of memory are we making today?",
+  "So... what are we doing?","Let's find today's story.","What sounds fun right now?",
+  "What's today's adventure?","Ready to fight boredom?","Bored? Let's fix that.",
+  "Life's too short to scroll all day.","Let's make today slightly more interesting.",
+  "Your boredom ends here.","One random idea could change your whole day.",
+  "Are you here to chill or to party?","What's the move today?","Time to touch grass.",
+  "Time to cause a little chaos.","Let's roll the dice.","Today's excuse to leave the house?",
+  "Seize the day with a new idea.","Future you will thank you for this.",
+  "Your next favorite memory starts here.","Life happens outside your comfort zone.",
+  "Today's a good day for a side quest.","Make today worth remembering.",
+  "Still scrolling? How about something else?","Your couch is getting attached to you.",
+  "Main character moment incoming.","Character development awaits.","Your future self is watching."
+];
+
 /* ─── STATE ─────────────────────────────────── */
 let selectedCat = null;
 let currentIdeaId = null;
@@ -201,9 +223,11 @@ function renderCats(){
       <i class="ti ti-chevron-right cat-arrow"></i>`;
     card.onclick=()=>{
       if(selectedCat===key){
-        selectedCat=null; // deselect → random mode
+        selectedCat=null;
+        if(window.setBgMode) window.setBgMode('rain');
       } else {
         selectedCat=key;
+        if(window.setBgMode) window.setBgMode(CAT_BG[key]||'rain');
       }
       document.getElementById('fab').disabled=false;
       playPop();
@@ -239,6 +263,7 @@ function showIdea(catKey, idea){
 
   const saveBtn=document.getElementById('ideaSaveBtn');
   saveBtn.classList.toggle('saved',!!liked[currentIdeaId]);
+  document.getElementById('saveIcon').textContent = liked[currentIdeaId] ? '❤️' : '🤍';
 
   const overlay=document.getElementById('overlay');
   overlay.classList.add('show');
@@ -262,10 +287,12 @@ function toggleSave(){
   if(liked[currentIdeaId]){
     delete liked[currentIdeaId];
     btn.classList.remove('saved');
+    document.getElementById('saveIcon').textContent='🤍';
     showToast('Removed');
   } else {
     liked[currentIdeaId]={catKey,idx:+idxStr,title:idea.t};
     btn.classList.add('saved');
+    document.getElementById('saveIcon').textContent='❤️';
     playHeart();
     showToast('Saved ♥');
   }
@@ -331,7 +358,16 @@ function showToast(msg){
   t._t=setTimeout(()=>t.classList.remove('show'),1800);
 }
 
+/* ─── FAB CLICK WITH FLASH ───────────────────── */
+function fabClick(){
+  const inner = document.getElementById('fabInner');
+  inner.classList.add('flash');
+  setTimeout(()=>inner.classList.remove('flash'), 200);
+  newIdea();
+}
+
 /* ─── INIT ──────────────────────────────────── */
 document.getElementById('fab').disabled = false;
+document.getElementById('app-title-text').textContent = TITLES[Math.floor(Math.random()*TITLES.length)];
 renderFilters();
 renderCats();

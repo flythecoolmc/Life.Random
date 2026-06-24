@@ -11,13 +11,16 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-family:'Inter',sans-serif}
 html,body{height:100%;background:#0f1117;color:#f4f3f7;overscroll-behavior:none}
-#app{max-width:480px;margin:0 auto;height:100%;display:flex;flex-direction:column;position:relative;overflow:hidden}
+
+#rainCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+
+#app{max-width:480px;margin:0 auto;height:100%;display:flex;flex-direction:column;position:relative;overflow:hidden;z-index:1;background:transparent}
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 @keyframes ideaIn{0%{opacity:0;transform:scale(.88) translateY(20px)}100%{opacity:1;transform:scale(1) translateY(0)}}
 @keyframes heartPop{0%{transform:scale(1)}45%{transform:scale(1.45)}100%{transform:scale(1)}}
 
-.scr{flex:1;overflow-y:auto;padding:28px 20px 140px;scrollbar-width:none}
+.scr{flex:1;overflow-y:auto;padding:28px 20px 140px;scrollbar-width:none;background:transparent}
 .scr::-webkit-scrollbar{display:none}
 
 /* HEADER */
@@ -40,8 +43,8 @@ html,body{height:100%;background:#0f1117;color:#f4f3f7;overscroll-behavior:none}
 .fgroup:last-of-type{margin-bottom:0}
 .fgroup-label{font-size:10px;font-weight:700;color:#5a5968;letter-spacing:1.4px;text-transform:uppercase;margin-bottom:10px}
 .fopts{display:flex;flex-wrap:wrap;gap:7px}
-.fopt{padding:7px 13px;border-radius:100px;border:1px solid #2a2f3e;font-size:12.5px;color:#6b6a7a;cursor:pointer;transition:all .15s;font-weight:500;background:transparent;user-select:none}
-.fopt.sel{border-color:#7c5cff;color:#a78bfa;background:rgba(124,92,255,.13)}
+.fopt{padding:7px 13px;border-radius:100px;border:1px solid #363b4e;font-size:12.5px;color:#9b99b8;cursor:pointer;transition:all .15s;font-weight:500;background:#1e2235;user-select:none}
+.fopt.sel{border-color:#7c5cff;color:#d4b8ff;background:rgba(124,92,255,.2)}
 .filter-footer{display:flex;gap:9px;margin-top:16px;padding-top:16px;border-top:1px solid #262b3a}
 .fclear{flex:1;padding:11px;border-radius:13px;background:transparent;border:1px solid #2a2f3e;color:#6b6a7a;font-size:13px;font-weight:600;cursor:pointer}
 .fapply{flex:2;padding:11px;border-radius:13px;background:#7c5cff;border:none;color:#fff;font-size:13px;font-weight:700;cursor:pointer;transition:transform .12s}
@@ -50,27 +53,9 @@ html,body{height:100%;background:#0f1117;color:#f4f3f7;overscroll-behavior:none}
 /* CATEGORIES */
 .sec-label{font-size:11px;font-weight:700;color:#5a5968;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px;animation:fadeUp .45s .1s ease both}
 .cat-list{display:flex;flex-direction:column;gap:11px;animation:fadeUp .45s .12s ease both}
-
-.cat-card{
-  position:relative;
-  border-radius:22px;
-  padding:18px 20px;
-  overflow:hidden;
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-  gap:15px;
-  /* Scale transition — no fadeUp here */
-  transform:scale(1);
-  transition:transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .22s ease;
-}
+.cat-card{position:relative;border-radius:22px;padding:18px 20px;overflow:hidden;cursor:pointer;display:flex;align-items:center;gap:15px;transform:scale(1);transition:transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .22s ease;}
 .cat-card:active{transform:scale(.96);}
-/* Selected card scales UP */
-.cat-card.sel{
-  transform:scale(1.035);
-  box-shadow:0 0 0 3px rgba(255,255,255,.25), 0 8px 24px rgba(0,0,0,.3);
-}
-
+.cat-card.sel{transform:scale(1.035);box-shadow:0 0 0 3px rgba(255,255,255,.25), 0 8px 24px rgba(0,0,0,.3);}
 .cat-glow{position:absolute;top:-28px;right:-28px;width:100px;height:100px;border-radius:50%;filter:blur(20px);opacity:.5;pointer-events:none}
 .cat-emoji{font-size:27px;position:relative;z-index:1;flex-shrink:0;line-height:1}
 .cat-info{flex:1;position:relative;z-index:1;min-width:0}
@@ -81,8 +66,10 @@ html,body{height:100%;background:#0f1117;color:#f4f3f7;overscroll-behavior:none}
 
 /* FAB */
 .fab-wrap{position:absolute;bottom:calc(60px + max(env(safe-area-inset-bottom),0px));left:0;right:0;z-index:20;pointer-events:none;padding:0 24px}
-.fab-gradient{background:linear-gradient(transparent,#0f1117 46%);padding-top:22px;pointer-events:none}
-.fab-inner{display:flex;justify-content:center;pointer-events:all}
+.fab-gradient{padding-top:20px;pointer-events:none;display:flex;justify-content:center}
+.fab-inner{display:inline-flex;position:relative;pointer-events:all}
+.fab-inner::before{content:'';position:absolute;inset:-18px -28px;border-radius:100px;background:radial-gradient(ellipse at center, rgba(0,0,0,.72) 0%, transparent 70%);pointer-events:none;transition:background .15s;z-index:-1}
+.fab-inner.flash::before{background:radial-gradient(ellipse at center, rgba(255,255,255,.22) 0%, transparent 70%)}
 .fab{background:linear-gradient(135deg,#7c5cff,#9333ea);border:none;border-radius:100px;padding:17px 44px;color:#fff;font-weight:700;font-size:16px;cursor:pointer;display:flex;align-items:center;gap:9px;transition:transform .14s,box-shadow .14s;box-shadow:0 8px 28px rgba(124,92,255,.5);letter-spacing:.1px;white-space:nowrap}
 .fab:active{transform:scale(.95);box-shadow:0 4px 14px rgba(124,92,255,.4)}
 .fab:disabled{opacity:.28;cursor:default;box-shadow:none}
@@ -92,8 +79,8 @@ html,body{height:100%;background:#0f1117;color:#f4f3f7;overscroll-behavior:none}
 .overlay.show{opacity:1;pointer-events:all}
 .overlay-bg{position:absolute;inset:0;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);background:rgba(10,12,18,.78);cursor:pointer}
 .idea-card{position:relative;z-index:1;background:#1b1f2a;border-radius:28px;padding:28px 24px 24px;border:1px solid #2e3347;width:100%;max-width:400px;box-shadow:0 28px 70px rgba(0,0,0,.55);animation:ideaIn .4s cubic-bezier(.34,1.4,.64,1) both}
-.idea-dismiss{position:absolute;top:16px;right:16px;width:30px;height:30px;border-radius:50%;background:#262b3a;border:none;color:#6b6a7a;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color .15s}
-.idea-dismiss:hover{color:#f4f3f7}
+.idea-dismiss{position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;background:#262b3a;border:1px solid #363b4e;color:#c0bfd0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color .15s,background .15s;font-size:15px;font-weight:700}
+.idea-dismiss:hover{color:#fff;background:#363b4e}
 .idea-badge{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:100px;font-size:11px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;margin-bottom:16px}
 .idea-title{font-size:21px;font-weight:700;line-height:1.3;letter-spacing:-0.25px;margin-bottom:8px}
 .idea-sub{font-size:13.5px;color:#8b8a99;line-height:1.55;font-style:italic;margin-bottom:16px}
@@ -138,12 +125,15 @@ html,body{height:100%;background:#0f1117;color:#f4f3f7;overscroll-behavior:none}
 </style>
 </head>
 <body>
+
+<canvas id="rainCanvas"></canvas>
+
 <div id="app">
   <!-- HOME -->
   <div class="scr" id="homeScr">
     <div class="app-header">
       <div class="app-name">Idea Jar</div>
-      <div class="app-title">What are you feeling today?</div>
+      <div class="app-title" id="app-title-text">What are you feeling today?</div>
       <div class="app-sub">Pick a category, tap the button</div>
     </div>
 
@@ -192,7 +182,7 @@ html,body{height:100%;background:#0f1117;color:#f4f3f7;overscroll-behavior:none}
       <div class="idea-tags" id="ideaTags"></div>
       <div class="idea-btns">
         <button class="idea-btn-new" onclick="newIdea()"><i class="ti ti-refresh" style="font-size:16px"></i> New idea</button>
-        <button class="idea-btn-save" id="ideaSaveBtn" onclick="toggleSave()"><i class="ti ti-heart" style="font-size:19px"></i></button>
+        <button class="idea-btn-save" id="ideaSaveBtn" onclick="toggleSave()"><span id="saveIcon" style="font-size:20px">🤍</span></button>
       </div>
     </div>
   </div>
@@ -200,8 +190,8 @@ html,body{height:100%;background:#0f1117;color:#f4f3f7;overscroll-behavior:none}
   <!-- FAB -->
   <div class="fab-wrap" id="fabWrap">
     <div class="fab-gradient">
-      <div class="fab-inner">
-        <button class="fab" id="fab" onclick="newIdea()" disabled>
+      <div class="fab-inner" id="fabInner">
+        <button class="fab" id="fab" onclick="fabClick()" disabled>
           <i class="ti ti-bulb" style="font-size:19px"></i> Give me an idea
         </button>
       </div>
@@ -222,7 +212,232 @@ html,body{height:100%;background:#0f1117;color:#f4f3f7;overscroll-behavior:none}
 
   <div class="toast" id="toast"></div>
 </div>
+
 <script src="data.js"></script>
 <script src="app.js"></script>
+<script>
+/* ── BG ANIMATION ENGINE ── */
+(function(){
+  const canvas = document.getElementById('rainCanvas');
+  const ctx = canvas.getContext('2d');
+  let W, H;
+  let particles = [];
+  let currentMode = 'rain'; // default
+  let targetAlpha = 1, canvasAlpha = 1; // for fade transition
+  let nextMode = null;
+  let fading = false;
+
+  function resize(){
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  /* ── PARTICLE FACTORIES ── */
+  function makeRain(){
+    return { type:'rain', x:Math.random()*W, y:Math.random()*H,
+      len:8+Math.random()*14, speed:0.5+Math.random()*0.8,
+      opacity:0.12+Math.random()*0.22, width:0.6+Math.random()*0.7 };
+  }
+  function makeStar(){
+    return { type:'star', x:Math.random()*W, y:Math.random()*H,
+      r:0.5+Math.random()*1.8, pulse:Math.random()*Math.PI*2,
+      pulseSpeed:0.01+Math.random()*0.025, opacity:0.2+Math.random()*0.6,
+      twinkle:0.3+Math.random()*0.5 };
+  }
+  function makeConfetti(){
+    const colors=['#ffd23f','#ff6b9d','#7c5cff','#4ade80','#ff8a4c','#5fd4c4','#c265ff'];
+    return { type:'confetti', x:Math.random()*W, y:-10-Math.random()*H,
+      w:5+Math.random()*7, h:3+Math.random()*4,
+      speed:0.8+Math.random()*1.2, drift:(-0.5+Math.random())*0.8,
+      rot:Math.random()*Math.PI*2, rotSpeed:(-0.05+Math.random()*0.1),
+      color:colors[Math.floor(Math.random()*colors.length)], opacity:0.7+Math.random()*0.3 };
+  }
+  function makeHeart(){
+    return { type:'heart', x:Math.random()*W, y:H+20,
+      size:6+Math.random()*10, speed:0.4+Math.random()*0.7,
+      drift:(-0.3+Math.random()*0.6), opacity:0.15+Math.random()*0.35,
+      wobble:Math.random()*Math.PI*2, wobbleSpeed:0.02+Math.random()*0.03 };
+  }
+  function makeParticle(){ // self improvement — rising dots
+    return { type:'particle', x:Math.random()*W, y:H+10,
+      r:1+Math.random()*2.5, speed:0.3+Math.random()*0.6,
+      opacity:0.1+Math.random()*0.3, drift:(-0.2+Math.random()*0.4),
+      pulse:Math.random()*Math.PI*2, pulseSpeed:0.02+Math.random()*0.04 };
+  }
+  function makeDanger(){
+    // warning triangles / bolts falling slowly
+    const shapes=['triangle','bolt'];
+    return { type:'danger', x:Math.random()*W, y:-30-Math.random()*H,
+      shape:shapes[Math.floor(Math.random()*shapes.length)],
+      size:8+Math.random()*14, speed:0.3+Math.random()*0.5,
+      rot:Math.random()*Math.PI*2, rotSpeed:(-0.02+Math.random()*0.04),
+      opacity:0.12+Math.random()*0.25,
+      color:Math.random()>0.5?'#ff4d4d':'#ffd23f' };
+  }
+
+  const MODES = {
+    rain:       { factory:makeRain,     count:640 },
+    adventure:  { factory:makeStar,     count:180 },
+    fun:        { factory:makeConfetti, count:120 },
+    romantic:   { factory:makeHeart,    count:60  },
+    party:      { factory:makeConfetti, count:180 },
+    crazy:      { factory:makeDanger,   count:90  },
+    selfimprovement: { factory:makeParticle, count:140 }
+  };
+
+  function initParticles(mode){
+    const def = MODES[mode] || MODES.rain;
+    particles = [];
+    for(let i=0;i<def.count;i++) particles.push(def.factory());
+  }
+
+  /* ── DRAW HEARTS (path) ── */
+  function drawHeart(ctx, x, y, size){
+    ctx.beginPath();
+    ctx.moveTo(x, y+size*0.3);
+    ctx.bezierCurveTo(x, y, x-size*0.5, y, x-size*0.5, y+size*0.3);
+    ctx.bezierCurveTo(x-size*0.5, y+size*0.6, x, y+size*0.9, x, y+size);
+    ctx.bezierCurveTo(x, y+size*0.9, x+size*0.5, y+size*0.6, x+size*0.5, y+size*0.3);
+    ctx.bezierCurveTo(x+size*0.5, y, x, y, x, y+size*0.3);
+    ctx.closePath();
+  }
+
+  function drawBolt(ctx, x, y, size){
+    ctx.beginPath();
+    ctx.moveTo(x+size*0.3, y);
+    ctx.lineTo(x-size*0.1, y+size*0.45);
+    ctx.lineTo(x+size*0.1, y+size*0.45);
+    ctx.lineTo(x-size*0.3, y+size);
+    ctx.lineTo(x+size*0.15, y+size*0.55);
+    ctx.lineTo(x-size*0.05, y+size*0.55);
+    ctx.closePath();
+  }
+
+  /* ── UPDATE + DRAW EACH TYPE ── */
+  function updateDraw(p){
+    switch(p.type){
+
+      case 'rain':
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(p.x+p.len*0.15, p.y+p.len);
+        ctx.strokeStyle=`rgba(180,180,200,${p.opacity})`;
+        ctx.lineWidth=p.width; ctx.lineCap='round'; ctx.stroke();
+        p.y+=p.speed; p.x+=p.speed*0.15;
+        if(p.y>H+p.len){ p.x=Math.random()*W; p.y=-p.len; }
+        break;
+
+      case 'star':
+        p.pulse+=p.pulseSpeed;
+        const brightness = p.opacity + Math.sin(p.pulse)*p.twinkle*0.4;
+        const r = p.r*(0.8+Math.sin(p.pulse)*0.3);
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,Math.max(0.1,r),0,Math.PI*2);
+        ctx.fillStyle=`rgba(220,210,255,${Math.max(0,brightness)})`;
+        ctx.fill();
+        // tiny glow
+        if(brightness>0.5){
+          ctx.beginPath(); ctx.arc(p.x,p.y,r*2.5,0,Math.PI*2);
+          ctx.fillStyle=`rgba(200,180,255,${brightness*0.08})`; ctx.fill();
+        }
+        break;
+
+      case 'confetti':
+        ctx.save();
+        ctx.translate(p.x+p.w/2, p.y+p.h/2);
+        ctx.rotate(p.rot);
+        ctx.fillStyle=p.color;
+        ctx.globalAlpha=p.opacity;
+        ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+        ctx.restore(); ctx.globalAlpha=1;
+        p.y+=p.speed; p.x+=p.drift; p.rot+=p.rotSpeed;
+        if(p.y>H+20){ Object.assign(p, makeConfetti()); p.y=-10; }
+        break;
+
+      case 'heart':
+        p.wobble+=p.wobbleSpeed;
+        ctx.save();
+        ctx.globalAlpha=p.opacity;
+        ctx.fillStyle='#ff6b9d';
+        drawHeart(ctx, p.x+Math.sin(p.wobble)*4 - p.size/2, p.y - p.size, p.size);
+        ctx.fill(); ctx.restore(); ctx.globalAlpha=1;
+        p.y-=p.speed; p.x+=p.drift;
+        if(p.y<-p.size*2){ Object.assign(p, makeHeart()); }
+        break;
+
+      case 'particle':
+        p.pulse+=p.pulseSpeed;
+        const op=p.opacity*(0.6+Math.sin(p.pulse)*0.4);
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fillStyle=`rgba(74,222,128,${Math.max(0,op)})`; ctx.fill();
+        p.y-=p.speed; p.x+=p.drift;
+        if(p.y<-10){ Object.assign(p, makeParticle()); }
+        break;
+
+      case 'danger':
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.globalAlpha=p.opacity;
+        ctx.fillStyle=p.color;
+        if(p.shape==='triangle'){
+          ctx.beginPath();
+          ctx.moveTo(0,-p.size); ctx.lineTo(p.size*0.87,p.size*0.5);
+          ctx.lineTo(-p.size*0.87,p.size*0.5); ctx.closePath(); ctx.fill();
+          // ! inside
+          ctx.fillStyle='#0f1117';
+          ctx.font=`bold ${p.size*0.9}px Inter`;
+          ctx.textAlign='center'; ctx.textBaseline='middle';
+          ctx.fillText('!',0,p.size*0.15);
+        } else {
+          drawBolt(ctx,0,0,p.size); ctx.fill();
+        }
+        ctx.restore(); ctx.globalAlpha=1;
+        p.y+=p.speed; p.rot+=p.rotSpeed;
+        if(p.y>H+40){ Object.assign(p, makeDanger()); p.y=-30; }
+        break;
+    }
+  }
+
+  /* ── TRANSITION ── */
+  // called from app.js
+  window.setBgMode = function(mode){
+    if(mode === currentMode) return;
+    if(fading) return;
+    fading = true;
+    nextMode = mode;
+    // fade out
+    let alpha = 1;
+    const fadeOut = setInterval(()=>{
+      alpha -= 0.07;
+      canvas.style.opacity = Math.max(0, alpha);
+      if(alpha <= 0){
+        clearInterval(fadeOut);
+        currentMode = nextMode;
+        initParticles(currentMode);
+        // fade in
+        let a2 = 0;
+        const fadeIn = setInterval(()=>{
+          a2 += 0.07;
+          canvas.style.opacity = Math.min(1, a2);
+          if(a2 >= 1){ clearInterval(fadeIn); fading=false; }
+        }, 16);
+      }
+    }, 16);
+  };
+
+  /* ── MAIN LOOP ── */
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    particles.forEach(updateDraw);
+    requestAnimationFrame(draw);
+  }
+
+  initParticles('rain');
+  draw();
+})();
+</script>
 </body>
 </html>
