@@ -279,6 +279,19 @@ function dismissIdea(){
   document.getElementById('overlay').classList.remove('show');
 }
 
+function shareIdea(){
+  if(!currentIdeaId) return;
+  const [catKey, idxStr] = currentIdeaId.split('-');
+  const idea = CATS[catKey].ideas[+idxStr];
+  const cat = CATS[catKey];
+  const text = `${cat.emoji} ${idea.t}${idea.s ? '\n"'+idea.s+'"' : ''}\n\nvia Idea Jar — fight boredom 👉 ${window.location.href}`;
+  if(navigator.share){
+    navigator.share({ title:'Idea Jar', text }).catch(()=>{});
+  } else {
+    navigator.clipboard.writeText(text).then(()=> showToast('Copied to clipboard!')).catch(()=> showToast('Share not supported'));
+  }
+}
+
 function toggleSave(){
   if(!currentIdeaId) return;
   const [catKey,idxStr]=currentIdeaId.split('-');
