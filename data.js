@@ -49,6 +49,11 @@ adventure:{label:'Adventure',emoji:'🏕️',c1:'#ff8a4c',c2:'#d4622a',glow:'rgb
 {t:"Build a raft and actually test it",s:'Minecraft logic meets real consequences',tags:['Friends','Outdoors','Nature','Under €10','Full day','Active']},
 {t:"Do something you've always been too scared to do",s:'You already know what it is',tags:['Solo','Friends','Varies','Varies','High Energy']},
 {t:"Seek for geodes or other natural treasures",s:'The earth has been hiding things. Time to find them',tags:['Friends','Family','Solo','Outdoors','Nature','Free','Half day','Active']}
+{t:"Explore an internet rabbit hole",s:'Start anywhere. End up somewhere weird.',tags:['Solo','Home','Indoors','Free','30min','Lazy']},
+{t:"Plan a trip you'll probably never take — but make it detailed",s:'Budget, itinerary, everything. Dream big.',tags:['Solo','Home','Indoors','Free','30min','Lazy']},
+{t:"Pick a random country and learn 5 facts about it",s:'You will forget 4 of them immediately',tags:['Solo','Home','Indoors','Free','15min','Lazy']},
+{t:"Watch a YouTube video of someone doing something insane",s:'Free falling, base jumping, free solo climbing — pick your poison',tags:['Solo','Home','Indoors','Free','15min','Lazy']},
+{t:"Find the nearest place you've never been and walk there",s:'Could be 5 minutes away. Could be life-changing. Probably not.',tags:['Solo','Outdoors','Free','1 hour','Chill']},
 ]},
 chill:{label:'Chill',emoji:'☁️',c1:'#5fd4c4',c2:'#2a9d8f',glow:'rgba(95,212,196,.35)',ideas:[
 {t:"Find a pretty spot and listen to music",s:"Sometimes that's enough",tags:['Solo','Couple','Outdoors','Nature','City','Free','1 hour','Lazy']},
@@ -101,6 +106,16 @@ chill:{label:'Chill',emoji:'☁️',c1:'#5fd4c4',c2:'#2a9d8f',glow:'rgba(95,212,
 {t:"Make a playlist for a specific feeling",s:'Not a vibe. A very specific feeling at 11pm on a Tuesday',tags:['Solo','Home','Indoors','Free','30min','Lazy']},
 {t:"Find a field and just lie in it",s:'No agenda. No phone. Just sky',tags:['Solo','Couple','Outdoors','Nature','Free','1 hour','Lazy']},
 {t:"Do absolutely nothing and be okay with it",s:'Revolutionary concept',tags:['Solo','Home','Indoors','Free','Half day','Lazy']}
+{t:"Make the perfect cup of tea or coffee and actually enjoy it slowly",s:'No phone. No rush. Just the drink.',tags:['Solo','Home','Indoors','Free','15min','Lazy']},
+{t:"Find the most relaxing YouTube video and just watch it",s:'Fireplace, rain on a window, Bob Ross — your call',tags:['Solo','Home','Indoors','Free','30min','Lazy']},
+{t:"Think about 3 things that made you happy this week",s:'Sounds cheesy. Works anyway.',tags:['Solo','Home','Indoors','Free','15min','Lazy']},
+{t:"Look up ASMR and actually try it",s:'You might hate it. You might not.',tags:['Solo','Home','Indoors','Free','15min','Lazy']},
+{t:"Change your phone wallpaper to something that makes you happy",s:'Small thing. Weirdly effective.',tags:['Solo','Home','Indoors','Free','15min','Lazy']},
+{t:"Wikipedia rabbit hole",s:'Start on anything. See where you end up in 30 minutes.',tags:['Solo','Home','Indoors','Free','30min','Lazy']},
+{t:"Make your bed perfectly and then immediately lie in it",s:'The satisfaction is real',tags:['Solo','Home','Indoors','Free','15min','Lazy']},
+{t:"Watch old cartoons",s:'No context needed',tags:['Solo','Home','Indoors','Free','30min','Lazy']},
+{t:"Find a lo-fi playlist and just exist",s:'No agenda. Just vibes.',tags:['Solo','Home','Indoors','Free','Ongoing','Lazy']},
+{t:"Order some food and chill",s:'Sometimes the move is the obvious one',tags:['Solo','Couple','Home','Indoors','Under €20','Evening','Lazy']},
 ]},
 fun:{label:'Fun',emoji:'🎉',c1:'#ffd23f',c2:'#f0a500',glow:'rgba(255,210,63,.35)',ideas:[
 {t:"Go to a karaoke bar",s:"The ones who say they can't sing always go the hardest",tags:['Friends','City','Under €20','Evening','Active']},
@@ -145,6 +160,13 @@ fun:{label:'Fun',emoji:'🎉',c1:'#ffd23f',c2:'#f0a500',glow:'rgba(255,210,63,.3
 {t:"Seek for geodes or other natural treasures",s:'The earth has been hiding things. Time to find them',tags:['Friends','Family','Solo','Outdoors','Nature','Free','Half day','Active']},
 {t:"Drive somewhere absurdly far for one specific food item",s:'Two hours for nuggets? Absolutely',tags:['Friends','Couple','Road Trip','Under €20','Full day','Chill']},
 {t:"Hide 100 tiny objects around a friend's house without them knowing",s:'Months later they will still be finding them',tags:['Friends','Home','Indoors','Free','1 hour','Lazy']}
+{t:"Send the most unhinged meme you can find to a friend",s:'No context. Just send it.',tags:['Solo','Home','Indoors','Free','15min','Lazy']},
+{t:"Try to draw your friend from memory and send it to them",s:'It will be terrible. That is the point.',tags:['Solo','Home','Indoors','Free','15min','Lazy']},
+{t:"Change your friend's contact name to something ridiculous",s:'They will find out eventually',tags:['Solo','Home','Indoors','Free','15min','Lazy']},
+{t:"Make a tier list of literally anything",s:'Pizza toppings, countries, the months of the year — go',tags:['Solo','Home','Indoors','Free','15min','Lazy']},
+{t:"Find the worst movie on Netflix and watch the trailer",s:'The comments will be better than the film',tags:['Solo','Home','Indoors','Free','15min','Lazy']},
+{t:"Text someone 'we need to talk' and wait",s:'Chaotic neutral energy',tags:['Solo','Home','Indoors','Free','15min','Lazy']},
+{t:"Watch something funny on YouTube",s:'Falls, fails, or stand-up — you pick',tags:['Solo','Home','Indoors','Free','30min','Lazy']},
 ]},
 romantic:{label:'Romantic',emoji:'❤️',c1:'#ff6b9d',c2:'#e0457a',glow:'rgba(255,107,157,.35)',ideas:[
 {t:"Massage each other",s:'No special skills needed, just good intentions',tags:['Couple','Home','Indoors','Free','30min','Lazy']},
@@ -189,6 +211,12 @@ romantic:{label:'Romantic',emoji:'❤️',c1:'#ff6b9d',c2:'#e0457a',glow:'rgba(2
 {t:"Plan a trip together",s:"Cheap or expensive, 1 day or 1 month, as long as you're together",tags:['Couple','Home','Indoors','Free','1 hour','Chill']},
 {t:"Buy each other clothes or accessories you'd love to see on them",s:'Keep an open mind… and an open wallet',tags:['Couple','City','Under €50','Half day','Chill']},
 {t:"Buy a Lego set and build it together",s:"Everything is cool when you're part of the team",tags:['Couple','Home','Indoors','Under €20','Half day','Lazy']}
+{t:"Send them a voice message instead of a text",s:'Unexpectedly wholesome',tags:['Couple','Home','Indoors','Free','15min','Lazy']},
+{t:"Make them a playlist right now",s:'10 songs. No skips. Send it.',tags:['Couple','Home','Indoors','Free','15min','Lazy']},
+{t:"Text them something funny",s:'No reason needed',tags:['Couple','Home','Indoors','Free','15min','Lazy']},
+{t:"Send them a meme that made you think of them",s:'The love language of our generation',tags:['Couple','Home','Indoors','Free','15min','Lazy']},
+{t:"Plan a date night for next week — just plan it, don't tell them yet",s:'Half the fun is in the planning',tags:['Couple','Home','Indoors','Free','30min','Lazy']},
+{t:"Send them a genuine compliment out of nowhere",s:'No occasion needed. That is kind of the point.',tags:['Couple','Home','Indoors','Free','15min','Lazy']},
 ]},
 party:{label:'Party',emoji:'🍻',c1:'#ffb84c',c2:'#e8950a',glow:'rgba(255,184,76,.35)',ideas:[
 {t:"Beer pong tournament with a real bracket",s:'Seedings, trophy, the works',tags:['Friends','Home','Indoors','Free','Evening','Active']},
@@ -222,6 +250,9 @@ party:{label:'Party',emoji:'🍻',c1:'#ffb84c',c2:'#e8950a',glow:'rgba(255,184,7
 {t:"BBQ party",s:'Charcoal, good music, better company',tags:['Friends','Outdoors','Under €20','Half day','Active']},
 {t:"Beach party",s:'Sand everywhere, zero regrets',tags:['Friends','Outdoors','Nature','Under €20','Evening','High Energy']},
 {t:"Traffic light party",s:"Red = taken, yellow = it's complicated, green = ready to mingle. Wear accordingly",tags:['Friends','Home','Indoors','Under €10','Evening','High Energy']}
+{t:"Play online Skribbl.io with friends",s:'Prepare for arguments about what counts as a valid drawing',tags:['Friends','Home','Indoors','Free','1 hour','Active']},
+{t:"GeoGuessr battle — closest guess wins",s:'Geography knowledge not required. Confidence is.',tags:['Friends','Home','Indoors','Free','1 hour','Active']},
+{t:"Watch a bad movie together and roast it",s:'The worse the movie the better the night',tags:['Friends','Home','Indoors','Free','Evening','Lazy']},
 ]},
 summer:{label:'Summer',emoji:'☀️',c1:'#ff9a3c',c2:'#ff6b6b',glow:'rgba(255,154,60,.35)',ideas:[
 {t:"Make a lemonade",s:'Strawberry, cucumber, watermelon — pick your poison',tags:['Solo','Couple','Friends','Home','Indoors','Free','1 hour','Chill']},
@@ -275,6 +306,8 @@ crazy:{label:'Crazy',emoji:'🤡',c1:'#c265ff',c2:'#8e2de2',glow:'rgba(194,101,2
 {t:"Spend an entire day saying yes to everything anyone asks",s:'Set absolutely no boundaries and report back',tags:['Solo','Friends','Varies','Varies','Full day','Active']},
 {t:"Do the thing you've been scared to do for months",s:'You already know what it is',tags:['Solo','Varies','Varies','Active']},
 {t:"Go busking with zero musical ability",s:'A hat, a corner, and absolutely no shame',tags:['Friends','Solo','City','Outdoors','Free','Half day','Active']}
+{t:"Text someone 'I know what you did'",s:'Then go offline for an hour',tags:['Solo','Home','Indoors','Free','15min','Lazy']},
+{t:"Text your parents something completely out of character",s:'Watch them panic in real time',tags:['Solo','Home','Indoors','Free','15min','Lazy']},
 ]},
 selfimprovement:{label:'Self Improvement',emoji:'📈',c1:'#4ade80',c2:'#16a34a',glow:'rgba(74,222,128,.35)',ideas:[
 {t:"Learn a new instrument",s:"Your fingers will hate you for a week. Then they won't",tags:['Solo','Home','Indoors','Free','Ongoing','Lazy']},
@@ -330,5 +363,15 @@ selfimprovement:{label:'Self Improvement',emoji:'📈',c1:'#4ade80',c2:'#16a34a'
 {t:"Learn one card trick",s:"Uncles have been abusing this power for decades",tags:['Solo','Home','Indoors','Free','30min','Lazy']},
 {t:"Learn morse code",s:"Useless until suddenly incredibly useful",tags:['Solo','Home','Indoors','Free','Half day','Lazy']},
 {t:"Learn how to change a tire",s:"This skill will save you on a dark road at midnight",tags:['Solo','Outdoors','Free','30min','Active']}
+{t:"Delete 3 apps you waste time on",s:'You know which ones',tags:['Solo','Home','Indoors','Free','15min','Lazy']},
+{t:"Write down one thing you want to achieve this month",s:'One. Just one.',tags:['Solo','Home','Indoors','Free','15min','Lazy']},
+{t:"Do 10 pushups right now",s:'Just 10. That is all.',tags:['Solo','Home','Indoors','Free','15min','Active']},
+{t:"Drink a full glass of water right now",s:'You are probably dehydrated',tags:['Solo','Home','Indoors','Free','15min','Lazy']},
+{t:"Text someone you've been meaning to text for weeks",s:'Today is the day',tags:['Solo','Home','Indoors','Free','15min','Lazy']},
+{t:"Set one goal for tomorrow before you sleep",s:'One is enough',tags:['Solo','Home','Indoors','Free','15min','Lazy']},
+{t:"Read one Wikipedia article about something you know nothing about",s:'Start anywhere',tags:['Solo','Home','Indoors','Free','15min','Lazy']},
+{t:"Write down 3 things you're grateful for right now",s:'Sounds basic. Weirdly works.',tags:['Solo','Home','Indoors','Free','15min','Lazy']},
+{t:"Go outside for exactly 10 minutes",s:'No phone. Just walk.',tags:['Solo','Outdoors','Free','15min','Chill']},
+{t:"Clean one small thing right now",s:'Just one. That is enough.',tags:['Solo','Home','Indoors','Free','15min','Lazy']},
 ]}
 };
