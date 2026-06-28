@@ -4,6 +4,33 @@ const CAT_BG = {
   selfimprovement:'selfimprovement', summer:'summer'
 };
 
+/* ─── PAYWALL ────────────────────────────────── */
+const FREE_CATS = ['adventure','chill','fun'];
+const PREMIUM_CATS = ['romantic','party','crazy','selfimprovement','summer'];
+
+let isPro = false;
+try { isPro = localStorage.getItem('ij_pro') === 'true'; } catch(e){}
+
+function requiresPro(catKey){ return PREMIUM_CATS.includes(catKey); }
+function showPaywall(){ document.getElementById('paywallOverlay').classList.add('show'); }
+function closePaywall(){ document.getElementById('paywallOverlay').classList.remove('show'); }
+function unlockPro(){ showToast('Payment coming soon!'); }
+function bypassPaywall(){
+  isPro = true;
+  try{ localStorage.setItem('ij_pro','true'); }catch(e){}
+  closePaywall();
+  renderCats();
+  updateProBadge();
+  showToast('Welcome, tester! 🎉');
+}
+
+function updateProBadge(){
+  ['proBadge','proBadge2'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.classList.toggle('show', isPro);
+  });
+}
+
 
 const TITLES = [
   "What's the vibe today?","What mood are we feeling?","What kind of memory are we making today?",
@@ -164,6 +191,7 @@ function refreshBadge(){
 }
 
 function toggleFilters(){
+  if(!isPro){ playPop(); showPaywall(); return; }
   filtersOpen=!filtersOpen;
   document.getElementById('filterPanel').classList.toggle('open',filtersOpen);
   document.getElementById('filterChevron').classList.toggle('open',filtersOpen);
@@ -209,22 +237,24 @@ function renderCats(){
     const cat=CATS[key];
     const count=getFiltered(key).length;
     const sel=selectedCat===key;
+    const locked=!isPro && PREMIUM_CATS.includes(key);
     const card=document.createElement('div');
-    // NO animation class — we handle scale via CSS transform directly
-    card.className='cat-card'+(sel?' sel':'');
+    card.className='cat-card'+(sel?' sel':'')+(locked?' premium-locked':'');
     card.style.background=`linear-gradient(145deg,${cat.c1},${cat.c2})`;
+    if(locked){ card.style.opacity='0.45'; card.style.filter='blur(0.4px)'; }
     card.innerHTML=`
       <div class="cat-glow" style="background:${cat.glow}"></div>
       <div class="cat-emoji">${cat.emoji}</div>
       <div class="cat-info">
         <div class="cat-name">${cat.label}</div>
-        <div class="cat-count">${count} idea${count!==1?'s':''}</div>
+        <div class="cat-count">${locked ? '🔒 Pro' : count+' idea'+(count!==1?'s':'')}</div>
       </div>
-      <i class="ti ti-chevron-right cat-arrow"></i>`;
+      ${locked ? '<div class="premium-badge">PRO</div>' : '<i class="ti ti-chevron-right cat-arrow"></i>'}`;
     card.onclick=()=>{
+      if(locked){ playPop(); showPaywall(); return; }
       if(selectedCat===key){
         selectedCat=null;
-        if(window.setBgMode) window.setBgMode('rain');
+        if(window.setBgMode) window.setBgMode('default');
       } else {
         selectedCat=key;
         if(window.setBgMode) window.setBgMode(CAT_BG[key]||'rain');
@@ -353,6 +383,7 @@ function renderSaved(){
 /* ─── TABS ──────────────────────────────────── */
 function showTab(tab){
   const home=tab==='home';
+  if(!home && !isPro){ playPop(); showPaywall(); return; }
   playPop();
   document.getElementById('homeScr').style.display=home?'':'none';
   document.getElementById('savedScr').style.display=home?'none':'block';
@@ -382,5 +413,6 @@ function fabClick(){
 /* ─── INIT ──────────────────────────────────── */
 document.getElementById('fab').disabled = false;
 document.getElementById('app-title-text').textContent = TITLES[Math.floor(Math.random()*TITLES.length)];
+updateProBadge();
 renderFilters();
 renderCats();
