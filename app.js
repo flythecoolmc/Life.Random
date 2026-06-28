@@ -26,13 +26,12 @@ let currentIdeaId = null;
 let filtersOpen = false;
 let liked = {};
 let queues = {};
-let activeFilters = {category:[],people:[],location:[],cost:[],duration:[],energy:[]};
+let activeFilters = {people:[],location:[],cost:[],duration:[],energy:[]};
 
 try { liked = JSON.parse(localStorage.getItem('ij_liked')||'{}'); } catch(e){}
 try { queues = JSON.parse(localStorage.getItem('ij_queues')||'{}'); } catch(e){}
 
 const FILTER_DEFS = [
-  {key:'category', id:'fCategory', opts:['Adventure','Chill','Fun','Romantic','Party','Crazy','Self Improvement','Summer']},
   {key:'people',   id:'fPeople',   opts:['Solo','Couple','Friends','Family']},
   {key:'location', id:'fLocation', opts:['Home','Indoors','Outdoors','City','Nature','Road Trip']},
   {key:'cost',     id:'fCost',     opts:['Free','Under €10','Under €20','Under €50','Expensive','Varies']},
@@ -225,7 +224,7 @@ function renderCats(){
     card.onclick=()=>{
       if(selectedCat===key){
         selectedCat=null;
-        if(window.setBgMode) window.setBgMode('default');
+        if(window.setBgMode) window.setBgMode('rain');
       } else {
         selectedCat=key;
         if(window.setBgMode) window.setBgMode(CAT_BG[key]||'rain');
@@ -239,24 +238,8 @@ function renderCats(){
 }
 
 /* ─── IDEA DISPLAY ────────────────────────────── */
-// Map label → key
-const LABEL_TO_KEY = {};
-Object.keys(CATS).forEach(k => { LABEL_TO_KEY[CATS[k].label] = k; });
-
 function newIdea(){
-  // determine pool of categories
-  let pool;
-  if(selectedCat){
-    pool = [selectedCat];
-  } else if(activeFilters.category.length > 0){
-    pool = activeFilters.category.map(label => LABEL_TO_KEY[label]).filter(Boolean);
-  } else {
-    pool = Object.keys(CATS);
-  }
-  // filter to only cats that have matching ideas
-  pool = pool.filter(k => getFiltered(k).length > 0);
-  if(!pool.length){ showToast('No ideas match your filters'); return; }
-  const catKey = pool[Math.floor(Math.random()*pool.length)];
+  const catKey = selectedCat || Object.keys(CATS)[Math.floor(Math.random()*Object.keys(CATS).length)];
   const result = nextIdea(catKey);
   if(!result){ showToast('No ideas match your filters'); return; }
   playWhoosh();
