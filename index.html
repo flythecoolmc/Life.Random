@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#0f1117">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
 <title>Idea Jar</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.47.0/iconfont/tabler-icons.min.css">
@@ -25,7 +27,7 @@ html,body{height:100%;background:#0f1117;color:#f4f3f7;overscroll-behavior:none}
 
 /* HEADER */
 .app-header{margin-bottom:26px;animation:fadeUp .45s ease both}
-.app-name{font-size:12px;font-weight:600;color:#5a5968;letter-spacing:1.8px;text-transform:uppercase;margin-bottom:6px}
+.app-name{font-size:22px;font-weight:900;color:#f4f3f7;letter-spacing:-0.5px;text-transform:uppercase;margin-bottom:6px;line-height:1}
 .app-title{font-size:29px;font-weight:800;letter-spacing:-0.4px;line-height:1.15}
 .app-sub{font-size:13.5px;color:#8b8a99;margin-top:5px}
 
@@ -79,8 +81,8 @@ html,body{height:100%;background:#0f1117;color:#f4f3f7;overscroll-behavior:none}
 .overlay.show{opacity:1;pointer-events:all}
 .overlay-bg{position:absolute;inset:0;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);background:rgba(10,12,18,.78);cursor:pointer}
 .idea-card{position:relative;z-index:1;background:#1b1f2a;border-radius:28px;padding:28px 24px 24px;border:1px solid #2e3347;width:100%;max-width:400px;box-shadow:0 28px 70px rgba(0,0,0,.55);animation:ideaIn .4s cubic-bezier(.34,1.4,.64,1) both}
-.idea-dismiss{position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;background:#262b3a;border:1px solid #363b4e;color:#c0bfd0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color .15s,background .15s;font-size:15px;font-weight:700}
-.idea-dismiss:hover{color:#fff;background:#363b4e}
+.idea-dismiss{position:absolute;top:16px;right:16px;width:34px;height:34px;border-radius:50%;background:#363b4e;border:1.5px solid #4a5068;color:#e0dff0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color .15s,background .15s;font-size:16px;font-weight:800;line-height:1}
+.idea-dismiss:hover{color:#fff;background:#4a5068}
 .idea-badge{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:100px;font-size:11px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;margin-bottom:16px}
 .idea-title{font-size:21px;font-weight:700;line-height:1.3;letter-spacing:-0.25px;margin-bottom:8px}
 .idea-sub{font-size:13.5px;color:#8b8a99;line-height:1.55;font-style:italic;margin-bottom:16px}
@@ -108,11 +110,11 @@ html,body{height:100%;background:#0f1117;color:#f4f3f7;overscroll-behavior:none}
 
 /* NAV */
 .nav{background:rgba(15,17,23,.93);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border-top:1px solid #191c27;display:flex;justify-content:space-around;padding:12px 0;padding-bottom:max(env(safe-area-inset-bottom),12px);position:relative;z-index:30}
-.nav-btn{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;opacity:.32;transition:opacity .18s;background:none;border:none;color:#f4f3f7;padding:2px 28px}
+.nav-btn{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;opacity:.32;transition:opacity .18s;background:none;border:none;color:#f4f3f7;padding:4px 32px}
 .nav-btn.active{opacity:1}
 .nav-btn.active i{color:#7c5cff}
-.nav-icon{font-size:22px}
-.nav-label{font-size:10.5px;font-weight:600}
+.nav-icon{font-size:26px}
+.nav-label{font-size:11.5px;font-weight:700}
 
 /* EMPTY + TOAST */
 .empty{text-align:center;padding:64px 24px;animation:fadeUp .4s ease both}
@@ -134,7 +136,7 @@ html,body{height:100%;background:#0f1117;color:#f4f3f7;overscroll-behavior:none}
     <div class="app-header">
       <div class="app-name">Idea Jar</div>
       <div class="app-title" id="app-title-text">What are you feeling today?</div>
-      <div class="app-sub">Pick a category, tap the button</div>
+      <div class="app-sub">Pick your category and get an idea!</div>
     </div>
 
     <div class="filter-bar">
@@ -165,7 +167,7 @@ html,body{height:100%;background:#0f1117;color:#f4f3f7;overscroll-behavior:none}
   <div class="saved-scr" id="savedScr">
     <div class="app-header">
       <div class="app-name">Idea Jar</div>
-      <div class="app-title">Saved ideas</div>
+      <div class="app-title">My ideas</div>
       <div class="app-sub">Your future nostalgia</div>
     </div>
     <div id="savedList"></div>
@@ -175,7 +177,7 @@ html,body{height:100%;background:#0f1117;color:#f4f3f7;overscroll-behavior:none}
   <div class="overlay" id="overlay">
     <div class="overlay-bg" onclick="dismissIdea()"></div>
     <div class="idea-card" id="ideaCard">
-      <button class="idea-dismiss" onclick="dismissIdea()"><i class="ti ti-x" style="font-size:13px"></i></button>
+      <button class="idea-dismiss" onclick="dismissIdea()">×</button>
       <div class="idea-badge" id="ideaBadge"></div>
       <div class="idea-title" id="ideaTitle"></div>
       <div class="idea-sub" id="ideaSub"></div>
@@ -206,7 +208,7 @@ html,body{height:100%;background:#0f1117;color:#f4f3f7;overscroll-behavior:none}
     </button>
     <button class="nav-btn" id="navSaved" onclick="showTab('saved')">
       <i class="ti ti-heart nav-icon"></i>
-      <span class="nav-label">Saved</span>
+      <span class="nav-label">My Ideas</span>
     </button>
   </nav>
 
@@ -277,6 +279,15 @@ html,body{height:100%;background:#0f1117;color:#f4f3f7;overscroll-behavior:none}
       color:Math.random()>0.5?'#ff4d4d':'#ffd23f' };
   }
 
+  function makeSunray(){
+    return { type:'sunray', x:Math.random()*W, y:-20-Math.random()*60,
+      size:2+Math.random()*3.5, speed:0.4+Math.random()*0.7,
+      drift:0.1+Math.random()*0.3,
+      opacity:0.08+Math.random()*0.18,
+      color:Math.random()>0.5?'255,200,50':'255,160,60',
+      wobble:Math.random()*Math.PI*2, wobbleSpeed:0.01+Math.random()*0.02 };
+  }
+
   const MODES = {
     rain:       { factory:makeRain,     count:640 },
     adventure:  { factory:makeStar,     count:180 },
@@ -284,7 +295,8 @@ html,body{height:100%;background:#0f1117;color:#f4f3f7;overscroll-behavior:none}
     romantic:   { factory:makeHeart,    count:60  },
     party:      { factory:makeConfetti, count:180 },
     crazy:      { factory:makeDanger,   count:90  },
-    selfimprovement: { factory:makeParticle, count:140 }
+    selfimprovement: { factory:makeParticle, count:140 },
+    summer:     { factory:makeSunray,   count:120 }
   };
 
   function initParticles(mode){
@@ -318,6 +330,21 @@ html,body{height:100%;background:#0f1117;color:#f4f3f7;overscroll-behavior:none}
   /* ── UPDATE + DRAW EACH TYPE ── */
   function updateDraw(p){
     switch(p.type){
+
+      case 'sunray':
+        p.wobble+=p.wobbleSpeed;
+        ctx.beginPath();
+        ctx.arc(p.x+Math.sin(p.wobble)*3, p.y, p.size, 0, Math.PI*2);
+        ctx.fillStyle=`rgba(${p.color},${p.opacity})`;
+        ctx.fill();
+        // soft glow
+        ctx.beginPath();
+        ctx.arc(p.x+Math.sin(p.wobble)*3, p.y, p.size*2.5, 0, Math.PI*2);
+        ctx.fillStyle=`rgba(${p.color},${p.opacity*0.3})`;
+        ctx.fill();
+        p.y+=p.speed; p.x+=p.drift;
+        if(p.y>H+20){ Object.assign(p, makeSunray()); }
+        break;
 
       case 'rain':
         ctx.beginPath();
@@ -438,6 +465,13 @@ html,body{height:100%;background:#0f1117;color:#f4f3f7;overscroll-behavior:none}
   initParticles('rain');
   draw();
 })();
+</script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(()=>{});
+  });
+}
 </script>
 </body>
 </html>

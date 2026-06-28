@@ -1,22 +1,14 @@
 {
-  "name": "Life.Random",
-  "short_name": "Life.Random",
-  "description": "App that randomizes what to do today with actually good suggestions",
-  "theme_color": "#0f1117",
-  "background_color": "#0f1117",
-  "display": "standalone",
-  "orientation": "portrait",
+  "name": "Idea Jar",
+  "short_name": "Idea Jar",
+  "description": "Fight boredom with random ideas for any mood.",
   "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f1117",
+  "theme_color": "#7c5cff",
+  "orientation": "portrait",
   "icons": [
-    {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
   ]
 }

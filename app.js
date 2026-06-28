@@ -1,7 +1,7 @@
 const CAT_BG = {
   adventure:'adventure', chill:'rain', fun:'fun',
   romantic:'romantic', party:'party', crazy:'crazy',
-  selfimprovement:'selfimprovement'
+  selfimprovement:'selfimprovement', summer:'summer'
 };
 
 
