@@ -154,7 +154,10 @@ function getFiltered(catKey){
   if(!any) return ideas;
   return ideas.filter(idea=>{
     for(const [k,arr] of Object.entries(f)){
-      if(arr.length && !arr.some(v=>idea.tags.includes(v))) return false;
+      if(!arr.length) continue;
+      // If "Varies" is selected in cost or duration, skip that filter entirely
+      if((k==='cost' || k==='duration') && arr.includes('Varies')) continue;
+      if(!arr.some(v=>idea.tags.includes(v))) return false;
     }
     return true;
   });
