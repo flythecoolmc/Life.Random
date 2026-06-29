@@ -171,9 +171,12 @@ function renderFilters(){
     el.innerHTML='';
     opts.forEach(opt=>{
       const d = document.createElement('div');
-      d.className='fopt'+(activeFilters[key].includes(opt)?' sel':'');
-      d.textContent=opt;
+      const isProCatOpt = key==='category' && PREMIUM_CATS.map(k=>CATS[k]?.label).includes(opt);
+      const isLocked = isProCatOpt && !isPro;
+      d.className='fopt'+(activeFilters[key].includes(opt)?' sel':'')+(isLocked?' fopt-locked':'');
+      d.textContent = isLocked ? '🔒 '+opt : opt;
       d.onclick=()=>{
+        if(isLocked){ showPaywall(); return; }
         const arr=activeFilters[key];
         const i=arr.indexOf(opt);
         i>-1?arr.splice(i,1):arr.push(opt);
@@ -198,7 +201,6 @@ function refreshBadge(){
 }
 
 function toggleFilters(){
-  if(!isPro){ playPop(); showPaywall(); return; }
   filtersOpen=!filtersOpen;
   document.getElementById('filterPanel').classList.toggle('open',filtersOpen);
   document.getElementById('filterChevron').classList.toggle('open',filtersOpen);
@@ -553,7 +555,6 @@ function showTab(tab){
   const home = tab==='home';
   const saved = tab==='saved';
   const doneTab = tab==='done';
-  if(!home && !isPro){ playPop(); showPaywall(); return; }
   playPop();
 
   // When leaving saved tab, remove done items from liked

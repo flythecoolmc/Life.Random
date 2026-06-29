@@ -147,7 +147,7 @@ html,body{height:100%;background:#1a1a2e;color:#f4f3f7;overscroll-behavior:none}
 .toast{position:absolute;top:20px;left:50%;transform:translateX(-50%);background:#1e2235;border:1px solid #7c5cff;border-radius:100px;padding:11px 20px;font-size:13px;font-weight:600;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .25s;z-index:60;display:flex;align-items:center;gap:7px}
 .toast.show{opacity:1}
 /* PAYWALL */
-.paywall-overlay{position:absolute;inset:0;z-index:55;display:flex;align-items:flex-end;justify-content:center;padding:0;pointer-events:none;opacity:0;transition:opacity .3s ease}
+.paywall-overlay{position:fixed;inset:0;z-index:70;display:flex;align-items:flex-end;justify-content:center;padding:0;pointer-events:none;opacity:0;transition:opacity .3s ease}
 .paywall-overlay.show{opacity:1;pointer-events:all}
 .paywall-bg{position:absolute;inset:0;background:rgba(6,7,14,.7);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 .paywall-card{position:relative;z-index:1;background:#1b1f2a;border-radius:28px 28px 0 0;padding:32px 24px 40px;width:100%;border:1px solid #2e3347;border-bottom:none;box-shadow:0 -20px 60px rgba(0,0,0,.5);animation:slideUp .35s cubic-bezier(.34,1.3,.64,1) both}
@@ -330,7 +330,7 @@ html,body{height:100%;background:#1a1a2e;color:#f4f3f7;overscroll-behavior:none}
         <div class="paywall-feature"><span>🕯️</span> Scary Sh*t category</div>
         <div class="paywall-feature"><span>📼</span> Nostalgic category</div>
       </div>
-      <button class="paywall-btn" onclick="unlockPro()">Get Pro — $1.99</button>
+      <button class="paywall-btn" onclick="unlockPro()">Get Pro — $4.99</button>
       <button class="paywall-bypass" onclick="bypassPaywall()">I have a code / Continue as tester</button>
     </div>
   </div>
