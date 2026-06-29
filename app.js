@@ -247,10 +247,12 @@ function renderCats(){
     const count=getFiltered(key).length;
     const sel=selectedCat===key;
     const locked=!isPro && PREMIUM_CATS.includes(key);
+    const isPremiumCat=PREMIUM_CATS.includes(key);
     const card=document.createElement('div');
     card.className='cat-card'+(sel?' sel':'')+(locked?' premium-locked':'');
     card.style.background=`linear-gradient(145deg,${cat.c1},${cat.c2})`;
     if(locked){ card.style.opacity='0.45'; card.style.filter='blur(0.4px)'; }
+    else { card.style.opacity=''; card.style.filter=''; }
     card.innerHTML=`
       <div class="cat-glow" style="background:${cat.glow}"></div>
       <div class="cat-emoji">${cat.emoji}</div>
@@ -258,7 +260,7 @@ function renderCats(){
         <div class="cat-name">${cat.label}</div>
         <div class="cat-count">${locked ? '🔒 Pro' : count+' idea'+(count!==1?'s':'')}</div>
       </div>
-      ${locked ? '<div class="premium-badge">PRO</div>' : '<i class="ti ti-chevron-right cat-arrow"></i>'}`;
+      ${isPremiumCat ? '<div class="premium-badge">PRO</div>' : '<i class="ti ti-chevron-right cat-arrow"></i>'}`;
     card.onclick=()=>{
       if(locked){ playPop(); showPaywall(); return; }
       if(selectedCat===key){
