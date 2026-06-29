@@ -1,12 +1,12 @@
 const CAT_BG = {
   adventure:'adventure', chill:'rain', fun:'fun',
   romantic:'romantic', party:'party', crazy:'crazy',
-  selfimprovement:'selfimprovement', summer:'summer'
+  selfimprovement:'selfimprovement', summer:'summer', scary:'scary', nostalgic:'nostalgic'
 };
 
 /* ─── PAYWALL ────────────────────────────────── */
 const FREE_CATS = ['adventure','chill','fun'];
-const PREMIUM_CATS = ['romantic','party','crazy','selfimprovement','summer'];
+const PREMIUM_CATS = ['romantic','party','crazy','selfimprovement','summer','scary','nostalgic'];
 
 let isPro = false;
 try { isPro = localStorage.getItem('ij_pro') === 'true'; } catch(e){}
@@ -25,7 +25,7 @@ function bypassPaywall(){
 }
 
 function updateProBadge(){
-  ['proBadge','proBadge2'].forEach(id => {
+  ['proBadge','proBadge2','proBadge3'].forEach(id => {
     const el = document.getElementById(id);
     if(el) el.classList.toggle('show', isPro);
   });
@@ -52,13 +52,16 @@ let selectedCat = null;
 let currentIdeaId = null;
 let filtersOpen = false;
 let liked = {};
+let done = {};
+try { done = JSON.parse(localStorage.getItem('ij_done')||'{}'); } catch(e){}
 let queues = {};
-let activeFilters = {people:[],location:[],cost:[],duration:[],energy:[]};
+let activeFilters = {category:[],people:[],location:[],cost:[],duration:[],energy:[]};
 
 try { liked = JSON.parse(localStorage.getItem('ij_liked')||'{}'); } catch(e){}
 try { queues = JSON.parse(localStorage.getItem('ij_queues')||'{}'); } catch(e){}
 
 const FILTER_DEFS = [
+  {key:'category', id:'fCategory', opts:['Adventure','Chill','Fun','Romantic','Party','Summer','Crazy','Self Improvement','Scary','Nostalgic']},
   {key:'people',   id:'fPeople',   opts:['Solo','Couple','Friends','Family']},
   {key:'location', id:'fLocation', opts:['Home','Indoors','Outdoors','City','Nature','Road Trip']},
   {key:'cost',     id:'fCost',     opts:['Free','Under €10','Under €20','Under €50','Expensive','Varies']},
@@ -140,6 +143,7 @@ function playDismiss(){
 
 /* ─── PERSIST ───────────────────────────────── */
 function saveLiked(){ try{ localStorage.setItem('ij_liked', JSON.stringify(liked)); }catch(e){} }
+function saveDone(){ try{ localStorage.setItem('ij_done', JSON.stringify(done)); }catch(e){} }
 function saveQueues(){ try{ localStorage.setItem('ij_queues', JSON.stringify(queues)); }catch(e){} }
 
 /* ─── FILTERS ───────────────────────────────── */
@@ -267,13 +271,65 @@ function renderCats(){
   });
 }
 
+/* ─── LABEL → KEY MAP ───────────────────────────── */
+const LABEL_TO_KEY = {};
+Object.keys(CATS).forEach(k => { LABEL_TO_KEY[CATS[k].label] = k; });
+
+// Category name → tag name mapping (for cross-category search)
+const CAT_TAG_MAP = {
+  'adventure':'Adventure','chill':'Chill','fun':'Fun','romantic':'Romantic',
+  'party':'Party','summer':'Summer','crazy':'Crazy','selfimprovement':'Self Improvement',
+  'scary':'Scary','nostalgic':'Nostalgic'
+};
+
 /* ─── IDEA DISPLAY ────────────────────────────── */
 function newIdea(){
-  const catKey = selectedCat || Object.keys(CATS)[Math.floor(Math.random()*Object.keys(CATS).length)];
+  const catFilters = activeFilters.category || [];
+
+  if(selectedCat){
+    // Category selected on card — just use it
+    const result = nextIdea(selectedCat);
+    if(!result){ showToast('No ideas match your filters'); return; }
+    playWhoosh(); showIdea(result.catKey, result.idea);
+    return;
+  }
+
+  if(catFilters.length > 0){
+    const selectedTags = catFilters; // e.g. ['Adventure', 'Fun', 'Party']
+
+    // Temporarily clear category filter so getFiltered doesn't block ideas
+    const savedCatFilter = activeFilters.category;
+    activeFilters.category = [];
+
+    const pool = [];
+    Object.keys(CATS).forEach(catKey => {
+      if(!isPro && PREMIUM_CATS.includes(catKey)) return;
+      const filtered = getFiltered(catKey);
+      filtered.forEach(idea => {
+        if(selectedTags.some(tag => idea.tags.includes(tag))) {
+          pool.push({idea, catKey});
+        }
+      });
+    });
+
+    activeFilters.category = savedCatFilter; // restore
+
+    if(!pool.length){ showToast('No ideas match your filters'); return; }
+    const pick = pool[Math.floor(Math.random()*pool.length)];
+    playWhoosh(); showIdea(pick.catKey, pick.idea);
+    return;
+  }
+
+  // Random mode — pick from all unlocked categories
+  const allKeys = Object.keys(CATS).filter(k => {
+    if(!isPro && PREMIUM_CATS.includes(k)) return false;
+    return getFiltered(k).length > 0;
+  });
+  if(!allKeys.length){ showToast('No ideas match your filters'); return; }
+  const catKey = allKeys[Math.floor(Math.random()*allKeys.length)];
   const result = nextIdea(catKey);
   if(!result){ showToast('No ideas match your filters'); return; }
-  playWhoosh();
-  showIdea(result.catKey, result.idea);
+  playWhoosh(); showIdea(result.catKey, result.idea);
 }
 
 function showIdea(catKey, idea){
@@ -282,18 +338,37 @@ function showIdea(catKey, idea){
   currentIdeaId=catKey+'-'+fullIdx;
 
   document.getElementById('ideaBadge').textContent=cat.emoji+' '+cat.label;
-  document.getElementById('ideaBadge').style.cssText=`background:${cat.c1}22;color:${cat.c1}`;
+  document.getElementById('ideaBadge').style.cssText=`background:${cat.c1};color:#fff;`;
   document.getElementById('ideaTitle').textContent=idea.t;
 
   const sub=document.getElementById('ideaSub');
   sub.textContent=idea.s||'';
   sub.style.display=idea.s?'':'none';
 
-  document.getElementById('ideaTags').innerHTML=idea.tags.map(t=>`<span class="idea-tag">${t}</span>`).join('');
+  // All known category names
+  const CAT_NAMES = Object.values(CATS).map(c=>c.label);
+  const catTags = idea.tags.filter(t => CAT_NAMES.includes(t) && t !== cat.label);
+  const normalTags = idea.tags.filter(t => !CAT_NAMES.includes(t));
+
+  // Category tags next to badge
+  const catTagsEl = document.getElementById('ideaCatTags');
+  catTagsEl.innerHTML = catTags.map(t => {
+    const catKey = Object.keys(CATS).find(k => CATS[k].label === t);
+    const c = catKey ? CATS[catKey] : null;
+    return `<span class="idea-cat-tag" style="background:${c?c.c1:'#888'}">${c?c.emoji:''} ${t}</span>`;
+  }).join('');
+
+  // Normal tags only
+  document.getElementById('ideaTags').innerHTML=normalTags.map(t=>`<span class="idea-tag">${t}</span>`).join('');
 
   const saveBtn=document.getElementById('ideaSaveBtn');
   saveBtn.classList.toggle('saved',!!liked[currentIdeaId]);
   document.getElementById('saveIcon').textContent = liked[currentIdeaId] ? '❤️' : '🤍';
+  const doneBtn=document.getElementById('ideaDoneBtn');
+  if(doneBtn){
+    doneBtn.classList.toggle('done',!!done[currentIdeaId]);
+    document.getElementById('doneIcon').textContent = '🎉';
+  }
 
   const overlay=document.getElementById('overlay');
   overlay.classList.add('show');
@@ -309,6 +384,28 @@ function dismissIdea(){
   document.getElementById('overlay').classList.remove('show');
 }
 
+
+function toggleDone(){
+  if(!currentIdeaId) return;
+  const [catKey,idxStr]=currentIdeaId.split('-');
+  const idea=CATS[catKey].ideas[+idxStr];
+  const btn=document.getElementById('ideaDoneBtn');
+  const icon=document.getElementById('doneIcon');
+  if(done[currentIdeaId]){
+    delete done[currentIdeaId];
+    btn.classList.remove('done');
+    icon.textContent='🎉';
+    showToast('Unmarked');
+  } else {
+    done[currentIdeaId]={catKey,idx:+idxStr,title:idea.t,date:new Date().toISOString().slice(0,10)};
+    btn.classList.add('done');
+    icon.textContent='🎉';
+    playHeart();
+    showToast('Nice work! ✅');
+
+  }
+  saveDone();
+}
 function shareIdea(){
   if(!currentIdeaId) return;
   const [catKey, idxStr] = currentIdeaId.split('-');
@@ -340,6 +437,8 @@ function toggleSave(){
     showToast('Saved ♥');
   }
   saveLiked();
+  // update My Ideas live if visible
+  if(document.getElementById('savedScr').style.display !== 'none') renderSaved();
 }
 
 /* ─── SAVED SCREEN ────────────────────────────── */
@@ -355,8 +454,9 @@ function renderSaved(){
     const item=liked[id];
     const cat=CATS[item.catKey];
     if(!cat) return;
+    const isDone = !!done[id];
     const el=document.createElement('div');
-    el.className='saved-item';
+    el.className='saved-item'+(isDone?' done':'');
     el.style.animationDelay=(i*0.04)+'s';
     el.innerHTML=`
       <div class="saved-emoji">${cat.emoji}</div>
@@ -364,7 +464,29 @@ function renderSaved(){
         <div class="saved-title">${item.title}</div>
         <div class="saved-cat">${cat.label}</div>
       </div>
+      <button class="saved-done-btn${isDone?' done':''}" aria-label="Mark done">${isDone?'✅':''}</button>
       <button class="saved-del" aria-label="Remove"><i class="ti ti-x" style="font-size:14px"></i></button>`;
+    el.querySelector('.saved-done-btn').onclick=e=>{
+      e.stopPropagation();
+      const btn = e.currentTarget;
+      const titleEl = el.querySelector('.saved-title');
+      if(done[id]){
+        delete done[id];
+        btn.classList.remove('done');
+        btn.textContent = '';
+        el.classList.remove('done');
+        titleEl.style.textDecoration = '';
+        titleEl.style.color = '';
+      } else {
+        done[id]={catKey:item.catKey,idx:item.idx,title:item.title,date:new Date().toISOString().slice(0,10)};
+        btn.classList.add('done');
+        btn.textContent = '✅';
+        el.classList.add('done');
+        titleEl.style.textDecoration = 'line-through';
+        titleEl.style.color = '#4a4668';
+      }
+      saveDone();
+    };
     el.querySelector('.saved-del').onclick=e=>{
       e.stopPropagation();
       playDismiss();
@@ -380,17 +502,75 @@ function renderSaved(){
   });
 }
 
+function renderDone(){
+  const list=document.getElementById('doneList');
+  const keys=Object.keys(done);
+
+  if(!keys.length){
+    list.innerHTML=`<div class="empty"><div class="empty-emoji">✅</div><div class="empty-title">Nothing done yet</div><div class="empty-sub">Complete an idea and it'll show up here.</div></div>`;
+    return;
+  }
+
+  list.innerHTML='';
+
+  // Render done items
+  keys.forEach((id,i)=>{
+    const item=done[id];
+    const cat=CATS[item.catKey];
+    if(!cat) return;
+    const el=document.createElement('div');
+    el.className='saved-item done';
+    el.style.animationDelay=(i*0.04)+'s';
+    const dateStr = item.date ? new Date(item.date+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '';
+    el.innerHTML=`
+      <div class="saved-emoji">${cat.emoji}</div>
+      <div class="saved-body">
+        <div class="saved-title">${item.title}</div>
+        <div class="saved-cat">${cat.label}${dateStr?' · '+dateStr:''}</div>
+      </div>
+      <span style="font-size:18px;flex-shrink:0">✅</span>
+      <button class="saved-del" aria-label="Remove"><i class="ti ti-x" style="font-size:14px"></i></button>`;
+    el.querySelector('.saved-del').onclick=e=>{
+      e.stopPropagation();
+      playDismiss();
+      delete done[id];
+      saveDone();
+      renderDone();
+    };
+    el.onclick=()=>{
+      const idea=cat.ideas[item.idx];
+      if(idea){ playWhoosh(); showIdea(item.catKey,idea); }
+    };
+    list.appendChild(el);
+  });
+}
+
 /* ─── TABS ──────────────────────────────────── */
 function showTab(tab){
-  const home=tab==='home';
+  const home = tab==='home';
+  const saved = tab==='saved';
+  const doneTab = tab==='done';
   if(!home && !isPro){ playPop(); showPaywall(); return; }
   playPop();
-  document.getElementById('homeScr').style.display=home?'':'none';
-  document.getElementById('savedScr').style.display=home?'none':'block';
-  document.getElementById('fabWrap').style.display=home?'':'none';
-  document.getElementById('navHome').classList.toggle('active',home);
-  document.getElementById('navSaved').classList.toggle('active',!home);
-  if(!home) renderSaved();
+
+  // When leaving saved tab, remove done items from liked
+  const leavingSaved = document.getElementById('savedScr').style.display === 'block' && !saved;
+  if(leavingSaved){
+    Object.keys(liked).forEach(id => {
+      if(done[id]){ delete liked[id]; }
+    });
+    saveLiked();
+  }
+
+  document.getElementById('homeScr').style.display = home ? '' : 'none';
+  document.getElementById('savedScr').style.display = saved ? 'block' : 'none';
+  document.getElementById('doneScr').style.display = doneTab ? 'block' : 'none';
+  document.getElementById('fabWrap').style.display = home ? '' : 'none';
+  document.getElementById('navHome').classList.toggle('active', home);
+  document.getElementById('navSaved').classList.toggle('active', saved);
+  document.getElementById('navDone').classList.toggle('active', doneTab);
+  if(saved) renderSaved();
+  if(doneTab) renderDone();
 }
 
 /* ─── TOAST ─────────────────────────────────── */
@@ -416,3 +596,4 @@ document.getElementById('app-title-text').textContent = TITLES[Math.floor(Math.r
 updateProBadge();
 renderFilters();
 renderCats();
+

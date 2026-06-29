@@ -37,7 +37,9 @@ html,body{height:100%;background:#1a1a2e;color:#f4f3f7;overscroll-behavior:none}
 
 /* FILTERS */
 .filter-bar{margin-bottom:22px;animation:fadeUp .45s .06s ease both}
-.filter-toggle{display:flex;align-items:center;gap:9px;background:#1b1f2a;border:1px solid #262b3a;border-radius:16px;padding:13px 16px;cursor:pointer;font-size:14px;font-weight:500;color:#9b9aa8;transition:border-color .2s;width:100%;text-align:left}
+@keyframes filterShine{0%{transform:translateX(-100%) skewX(-15deg)}100%{transform:translateX(350%) skewX(-15deg)}}
+.filter-toggle{display:flex;align-items:center;gap:9px;background:#1b1f2a;border:1px solid #262b3a;border-radius:16px;padding:13px 16px;cursor:pointer;font-size:14px;font-weight:500;color:#9b9aa8;transition:border-color .2s;width:100%;text-align:left;position:relative;overflow:hidden}
+.filter-toggle::after{content:'';position:absolute;top:0;left:0;width:40%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);transform:translateX(-100%) skewX(-15deg);animation:filterShine 4.5s ease-in-out infinite;animation-delay:2s}
 .filter-toggle.has-filters{border-color:#7c5cff;color:#a78bfa}
 .filter-badge{background:#7c5cff;color:#fff;font-size:10px;font-weight:700;min-width:18px;height:18px;border-radius:9px;padding:0 5px;display:none;align-items:center;justify-content:center}
 .filter-badge.show{display:flex}
@@ -71,7 +73,7 @@ html,body{height:100%;background:#1a1a2e;color:#f4f3f7;overscroll-behavior:none}
 .cat-card.sel .cat-arrow{opacity:1;transform:translateX(3px)}
 
 /* FAB */
-.fab-wrap{position:fixed;bottom:calc(72px + max(env(safe-area-inset-bottom),0px));left:50%;transform:translateX(-50%);z-index:20;pointer-events:none;padding:0 24px;width:100%;max-width:480px}
+.fab-wrap{position:fixed;bottom:calc(72px + max(env(safe-area-inset-bottom),0px));left:50%;transform:translateX(-50%);z-index:60;pointer-events:none;padding:0 24px;width:100%;max-width:480px}
 .fab-gradient{padding-top:20px;pointer-events:none;display:flex;justify-content:center}
 .fab-inner{display:inline-flex;position:relative;pointer-events:all}
 .fab-inner::before{content:'';position:absolute;inset:-18px -28px;border-radius:100px;background:radial-gradient(ellipse at center, rgba(0,0,0,.72) 0%, transparent 70%);pointer-events:none;transition:background .15s;z-index:-1}
@@ -82,26 +84,35 @@ html,body{height:100%;background:#1a1a2e;color:#f4f3f7;overscroll-behavior:none}
 #fabOrbit{position:absolute;pointer-events:none;z-index:10;top:0;left:0;width:100%;height:100%}
 
 /* IDEA OVERLAY */
-.overlay{position:absolute;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:22px;pointer-events:none;opacity:0;transition:opacity .28s ease}
+.overlay{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:22px 22px 160px 22px;pointer-events:none;opacity:0;transition:opacity .28s ease}
 .overlay.show{opacity:1;pointer-events:all}
-.overlay-bg{position:absolute;inset:0;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);background:rgba(10,12,18,.78);cursor:pointer}
-.idea-card{position:relative;z-index:1;background:#1b1f2a;border-radius:28px;padding:28px 24px 24px;border:1px solid #2e3347;width:100%;max-width:400px;box-shadow:0 28px 70px rgba(0,0,0,.55);animation:ideaIn .4s cubic-bezier(.34,1.4,.64,1) both}
-.idea-dismiss{position:absolute;top:16px;right:16px;width:34px;height:34px;border-radius:50%;background:#363b4e;border:1.5px solid #4a5068;color:#e0dff0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color .15s,background .15s;font-size:16px;font-weight:800;line-height:1}
-.idea-dismiss:hover{color:#fff;background:#4a5068}
-.idea-badge{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:100px;font-size:11px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;margin-bottom:16px}
-.idea-title{font-size:21px;font-weight:700;line-height:1.3;letter-spacing:-0.25px;margin-bottom:8px}
-.idea-sub{font-size:13.5px;color:#8b8a99;line-height:1.55;font-style:italic;margin-bottom:16px}
-.idea-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:22px}
-.idea-tag{font-size:11px;font-weight:500;padding:5px 11px;border-radius:100px;background:#262b3a;color:#9b9aa8}
-.idea-btns{display:flex;gap:10px}
+.overlay-bg{position:absolute;inset:0;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);background:rgba(10,12,18,.45);cursor:pointer}
+.idea-card{position:relative;z-index:1;background:#ffffff;border-radius:24px;padding:0;width:300px;max-width:300px;box-shadow:0 32px 80px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.08);animation:ideaIn .4s cubic-bezier(.34,1.4,.64,1) both;overflow:hidden}
+.idea-card-header{padding:16px 18px 14px;border-bottom:1px solid #f0f0f0;position:relative}
+.idea-card-brand{font-size:8px;font-weight:800;letter-spacing:2.5px;color:#cccccc;text-transform:uppercase;margin-bottom:12px;text-align:center}
+.idea-card-body{padding:14px 18px 18px;background:#ffffff}
+.idea-dismiss{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:50%;background:#f0f0f0;border:none;color:#999;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-size:16px;font-weight:700;line-height:1}
+.idea-dismiss:hover{background:#e0e0e0;color:#333}
+.idea-badge{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:100px;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;line-height:1;height:26px;box-sizing:border-box;vertical-align:middle}
+.idea-title{font-size:22px;font-weight:800;line-height:1.28;letter-spacing:-0.5px;margin-bottom:8px;color:#111111}
+.idea-sub{font-size:13px;color:#888888;line-height:1.6;font-style:italic;margin-bottom:16px}
+.idea-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px}
+.idea-tag{font-size:11px;font-weight:600;padding:4px 11px;border-radius:100px;background:#f4f4f4;color:#555555;border:1px solid #e8e8e8}
+.idea-btns{display:flex;justify-content:space-between;padding-top:4px}
+.idea-btn-wrap{display:flex;flex-direction:column;align-items:center;gap:6px}
+.idea-btn-label{font-size:10px;font-weight:600;color:#aaaaaa;letter-spacing:.3px;white-space:nowrap}
+.idea-cat-tag{display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:100px;font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:#fff;line-height:1;height:26px;box-sizing:border-box}
 .idea-btn-new{flex:1;background:linear-gradient(135deg,#7c5cff,#9333ea);border:none;border-radius:16px;padding:15px;color:#fff;font-weight:700;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:transform .12s;box-shadow:0 6px 20px rgba(124,92,255,.38)}
 .idea-btn-new:active{transform:scale(.96)}
-.idea-btn-save{width:52px;height:52px;flex-shrink:0;background:#262b3a;border:1px solid #363b4e;border-radius:16px;display:flex;align-items:center;justify-content:center;color:#8b8a99;cursor:pointer;transition:all .15s}
+.idea-btn-save{width:52px;height:52px;flex-shrink:0;background:#f4f4f4;border:1.5px solid #e8e8e8;border-radius:14px;display:flex;align-items:center;justify-content:center;color:#888;cursor:pointer;transition:all .15s}
 .idea-btn-save:active{transform:scale(.88)}
-.idea-btn-save.saved{color:#ff4d6d;border-color:rgba(255,77,109,.3);background:rgba(255,77,109,.09)}
+.idea-btn-save.saved{color:#ff4d6d;border-color:rgba(255,77,109,.4);background:rgba(255,77,109,.06)}
 .idea-btn-save.saved i{animation:heartPop .3s ease}
-.idea-btn-share{width:52px;height:52px;flex-shrink:0;background:#262b3a;border:1px solid #363b4e;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;transition:all .15s}
+.idea-btn-share{width:52px;height:52px;flex-shrink:0;background:#f4f4f4;border:1.5px solid #e8e8e8;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;transition:all .15s}
 .idea-btn-share:active{transform:scale(.88)}
+.idea-btn-done{width:52px;height:52px;flex-shrink:0;background:#f4f4f4;border:2px solid #e0e0e0;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;transition:all .15s}
+.idea-btn-done:active{transform:scale(.88)}
+.idea-btn-done.done{background:rgba(74,222,128,.08);border-color:rgba(74,222,128,.4)}
 
 /* SAVED */
 .saved-scr{flex:1;overflow-y:auto;padding:28px 20px 100px;display:none;scrollbar-width:none}
@@ -114,6 +125,11 @@ html,body{height:100%;background:#1a1a2e;color:#f4f3f7;overscroll-behavior:none}
 .saved-cat{font-size:11.5px;color:#6b6a7a;font-weight:500}
 .saved-del{width:30px;height:30px;background:none;border:none;color:#3a3a4a;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:8px;transition:color .15s}
 .saved-del:hover{color:#ff4d6d}
+.saved-item.done{opacity:.65}
+.saved-item.done .saved-title{text-decoration:line-through;color:#5a5875}
+.saved-done-btn{width:22px;height:22px;min-width:22px;background:none;border:2px solid #2a2f42;color:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:5px;transition:all .15s;font-size:13px;line-height:1;padding:0}
+.saved-done-btn:hover{border-color:#4ade80}
+.saved-done-btn.done{border-color:#4ade80;color:#4ade80;background:rgba(74,222,128,.1)}
 
 /* NAV */
 .nav{background:transparent;backdrop-filter:none;border-top:none;display:flex;justify-content:space-around;align-items:center;padding:10px 16px;padding-bottom:max(env(safe-area-inset-bottom),10px);position:relative;z-index:30;gap:10px}
@@ -149,6 +165,17 @@ html,body{height:100%;background:#1a1a2e;color:#f4f3f7;overscroll-behavior:none}
 .cat-card.premium-locked{position:relative}
 .premium-badge{position:absolute;top:10px;right:12px;background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:100px;padding:3px 9px;font-size:10px;font-weight:800;color:#fff;letter-spacing:.3px;z-index:2}
 
+/* DONE CALENDAR */
+.done-cal{background:#1b1f2a;border-radius:20px;padding:18px;margin-bottom:16px;border:1px solid #262b3a}
+.done-cal-header{font-size:14px;font-weight:700;color:#f0effe;margin-bottom:14px;text-align:center;letter-spacing:-.2px}
+.done-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:10px}
+.done-cal-day-label{font-size:10px;font-weight:600;color:#3d3b55;text-align:center;padding-bottom:4px}
+.done-cal-cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#3d3b55;border-radius:8px}
+.done-cal-cell.today{color:#a78bfa;font-weight:800}
+.done-cal-cell.done{background:#7c5cff;color:#fff;font-weight:700}
+.done-cal-cell.done.today{background:linear-gradient(135deg,#7c5cff,#9333ea);box-shadow:0 2px 8px rgba(124,92,255,.4)}
+.done-cal-count{font-size:11px;color:#4a4668;text-align:center;font-weight:500}
+
 </style>
 </head>
 <body>
@@ -176,6 +203,7 @@ html,body{height:100%;background:#1a1a2e;color:#f4f3f7;overscroll-behavior:none}
         <i class="ti ti-chevron-down filter-chevron" id="filterChevron"></i>
       </button>
       <div class="filter-panel" id="filterPanel">
+        <div class="fgroup"><div class="fgroup-label">Category</div><div class="fopts" id="fCategory"></div></div>
         <div class="fgroup"><div class="fgroup-label">People</div><div class="fopts" id="fPeople"></div></div>
         <div class="fgroup"><div class="fgroup-label">Location</div><div class="fopts" id="fLocation"></div></div>
         <div class="fgroup"><div class="fgroup-label">Cost</div><div class="fopts" id="fCost"></div></div>
@@ -206,19 +234,51 @@ html,body{height:100%;background:#1a1a2e;color:#f4f3f7;overscroll-behavior:none}
     <div id="savedList"></div>
   </div>
 
+  <!-- DONE -->
+  <div class="saved-scr" id="doneScr">
+    <div class="app-header">
+
+      <div class="app-brand">
+        <img class="app-brand-logo" src="data:image/png;base64,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" alt="Idea Jar">
+        <span class="app-brand-name">Idea Jar</span>
+        <span class="app-brand-pro" id="proBadge3">PRO</span>
+      </div>
+            <div class="app-title">Done</div>
+      <div class="app-sub">Things you actually did</div>
+    </div>
+    <div id="doneList"></div>
+  </div>
+
   <!-- OVERLAY -->
   <div class="overlay" id="overlay">
     <div class="overlay-bg" onclick="dismissIdea()"></div>
     <div class="idea-card" id="ideaCard">
-      <button class="idea-dismiss" onclick="dismissIdea()">×</button>
-      <div class="idea-badge" id="ideaBadge"></div>
-      <div class="idea-title" id="ideaTitle"></div>
-      <div class="idea-sub" id="ideaSub"></div>
-      <div class="idea-tags" id="ideaTags"></div>
-      <div class="idea-btns">
-        <button class="idea-btn-new" onclick="newIdea()"><i class="ti ti-refresh" style="font-size:16px"></i> New idea</button>
-        <button class="idea-btn-share" onclick="shareIdea()">📤</button>
-        <button class="idea-btn-save" id="ideaSaveBtn" onclick="toggleSave()"><span id="saveIcon" style="font-size:20px">🤍</span></button>
+      <div class="idea-card-header">
+        <div class="idea-card-brand">IDEA JAR</div>
+        <button class="idea-dismiss" onclick="dismissIdea()">×</button>
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:14px;min-height:26px">
+          <div class="idea-badge" id="ideaBadge"></div>
+          <div id="ideaCatTags" style="display:flex;flex-wrap:wrap;gap:6px;align-items:center"></div>
+        </div>
+        <div class="idea-title" id="ideaTitle"></div>
+        <div class="idea-sub" id="ideaSub"></div>
+      </div>
+      <div class="idea-card-body">
+        <div class="idea-tags" id="ideaTags"></div>
+        <div class="idea-btns">
+          <div class="idea-btn-wrap">
+            <button class="idea-btn-share" onclick="shareIdea()">📤</button>
+            <span class="idea-btn-label">Share</span>
+          </div>
+          <div class="idea-btn-wrap">
+            <button class="idea-btn-done" id="ideaDoneBtn" onclick="toggleDone()"><span id="doneIcon" style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:20px;line-height:1"></span></button>
+            <span class="idea-btn-label">Did it!</span>
+          </div>
+          <div class="idea-btn-wrap">
+            <button class="idea-btn-save" id="ideaSaveBtn" onclick="toggleSave()"><span id="saveIcon" style="font-size:20px">🤍</span></button>
+            <span class="idea-btn-label">Save</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -243,11 +303,16 @@ html,body{height:100%;background:#1a1a2e;color:#f4f3f7;overscroll-behavior:none}
     </button>
     <button class="nav-btn" id="navSaved" onclick="showTab('saved')">
       <i class="ti ti-heart nav-icon"></i>
-      <span class="nav-label">My Ideas</span>
+      <span class="nav-label">Saved</span>
+    </button>
+    <button class="nav-btn" id="navDone" onclick="showTab('done')">
+      <i class="ti ti-circle-check nav-icon"></i>
+      <span class="nav-label">Done</span>
     </button>
   </nav>
 
   <div class="toast" id="toast"></div>
+
 
   <!-- PAYWALL -->
   <div class="paywall-overlay" id="paywallOverlay">
@@ -262,6 +327,8 @@ html,body{height:100%;background:#1a1a2e;color:#f4f3f7;overscroll-behavior:none}
         <div class="paywall-feature"><span>🎛️</span> Advanced filters</div>
         <div class="paywall-feature"><span>💾</span> Save your favourite ideas</div>
         <div class="paywall-feature"><span>☀️</span> Summer category</div>
+        <div class="paywall-feature"><span>🕯️</span> Scary Sh*t category</div>
+        <div class="paywall-feature"><span>📼</span> Nostalgic category</div>
       </div>
       <button class="paywall-btn" onclick="unlockPro()">Get Pro — $1.99</button>
       <button class="paywall-bypass" onclick="bypassPaywall()">I have a code / Continue as tester</button>
@@ -300,6 +367,8 @@ html,body{height:100%;background:#1a1a2e;color:#f4f3f7;overscroll-behavior:none}
     party:          { stops:[[0,'#1e1b4b'],[0.5,'#4c1d95'],[1,'#7c3aed']] },
     crazy:          { stops:[[0,'#450a0a'],[0.5,'#991b1b'],[1,'#ef4444']] },
     selfimprovement:{ stops:[[0,'#042f2e'],[0.5,'#0f766e'],[1,'#2dd4bf']] },
+    scary:           { stops:[[0,'#0a0000'],[0.5,'#1a0000'],[1,'#0d0000']] },
+    nostalgic:       { stops:[[0,'#1a1814'],[0.5,'#2e2820'],[1,'#3d3528']] },
   };
 
   function applyGradient(mode){
@@ -518,6 +587,25 @@ html,body{height:100%;background:#1a1a2e;color:#f4f3f7;overscroll-behavior:none}
         ctx.restore(); ctx.globalAlpha=1;
         p.y+=p.speed; p.rot+=p.rotSpeed;
         if(p.y>H+40){ Object.assign(p,makeDanger()); p.y=-30; }
+        break;
+
+      case 'dust':
+        p.pulse+=p.pulseSpeed;
+        const dop=p.opacity*(0.5+Math.sin(p.pulse)*0.5);
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fillStyle=`rgba(220,210,190,${Math.max(0,dop)})`; ctx.fill();
+        p.y-=p.speed; p.x+=p.drift;
+        if(p.y<-5){ p.y=H+5; p.x=Math.random()*W; }
+        break;
+
+      case 'blood':
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(p.x + p.len*0.05, p.y + p.len);
+        ctx.strokeStyle=`rgba(180,0,0,${p.opacity})`;
+        ctx.lineWidth=p.width; ctx.lineCap='round'; ctx.stroke();
+        p.y+=p.speed; p.x+=p.speed*0.05;
+        if(p.y>H+p.len){ p.x=Math.random()*W; p.y=-p.len; }
         break;
 
       case 'sunsparkle':
