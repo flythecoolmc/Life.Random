@@ -14,12 +14,21 @@ try { isPro = localStorage.getItem('ij_pro') === 'true'; } catch(e){}
 function requiresPro(catKey){ return PREMIUM_CATS.includes(catKey); }
 function showPaywall(){ document.getElementById('paywallOverlay').classList.add('show'); }
 function closePaywall(){ document.getElementById('paywallOverlay').classList.remove('show'); }
-function unlockPro(){ showToast('Payment coming soon!'); }
+function unlockPro(){
+  isPro=true;
+  try{ localStorage.setItem('ij_pro','1'); }catch(e){}
+  updateProBadge();
+  renderFilters();
+  renderCats();
+  showToast('Pro unlocked! 🎉');
+  document.getElementById('paywallOverlay').classList.remove('show');
+}
 function bypassPaywall(){
   isPro = true;
   try{ localStorage.setItem('ij_pro','true'); }catch(e){}
   closePaywall();
   renderCats();
+  renderFilters();
   updateProBadge();
   showToast('Welcome, tester! 🎉');
 }
@@ -61,7 +70,7 @@ try { liked = JSON.parse(localStorage.getItem('ij_liked')||'{}'); } catch(e){}
 try { queues = JSON.parse(localStorage.getItem('ij_queues')||'{}'); } catch(e){}
 
 const FILTER_DEFS = [
-  {key:'category', id:'fCategory', opts:['Adventure','Chill','Fun','Romantic','Party','Summer','Crazy','Self Improvement','Scary','Nostalgic']},
+  {key:'category', id:'fCategory', opts:['Adventure','Chill','Fun','Romantic','Party','Summer','Crazy','Self Improvement','Scary Sh*t','Nostalgic']},
   {key:'people',   id:'fPeople',   opts:['Solo','Couple','Friends','Family']},
   {key:'location', id:'fLocation', opts:['Home','Indoors','Outdoors','City','Nature','Road Trip']},
   {key:'cost',     id:'fCost',     opts:['Free','Under €10','Under €20','Under €50','Expensive','Varies']},
@@ -172,11 +181,11 @@ function renderFilters(){
     opts.forEach(opt=>{
       const d = document.createElement('div');
       const isProCatOpt = key==='category' && PREMIUM_CATS.map(k=>CATS[k]?.label).includes(opt);
-      const isLocked = isProCatOpt && !isPro;
-      d.className='fopt'+(activeFilters[key].includes(opt)?' sel':'')+(isLocked?' fopt-locked':'');
-      d.textContent = isLocked ? '🔒 '+opt : opt;
+      d.className='fopt'+(activeFilters[key].includes(opt)?' sel':'')+(isProCatOpt && !isPro?' fopt-locked':'');
+      d.textContent = (isProCatOpt && !isPro) ? '🔒 '+opt : opt;
+      d.setAttribute('data-pro-opt', isProCatOpt ? '1' : '0');
       d.onclick=()=>{
-        if(isLocked){ showPaywall(); return; }
+        if(isProCatOpt && !isPro){ showPaywall(); return; }
         const arr=activeFilters[key];
         const i=arr.indexOf(opt);
         i>-1?arr.splice(i,1):arr.push(opt);
@@ -286,7 +295,7 @@ Object.keys(CATS).forEach(k => { LABEL_TO_KEY[CATS[k].label] = k; });
 const CAT_TAG_MAP = {
   'adventure':'Adventure','chill':'Chill','fun':'Fun','romantic':'Romantic',
   'party':'Party','summer':'Summer','crazy':'Crazy','selfimprovement':'Self Improvement',
-  'scary':'Scary','nostalgic':'Nostalgic'
+  'scary':'Scary Sh*t','nostalgic':'Nostalgic'
 };
 
 /* ─── IDEA DISPLAY ────────────────────────────── */
