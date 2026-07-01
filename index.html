@@ -38,7 +38,7 @@ html,body{height:100%;background:#1a1a2e;color:#f4f3f7;overscroll-behavior:none}
 /* FILTERS */
 .filter-bar{margin-bottom:22px;animation:fadeUp .45s .06s ease both}
 @keyframes filterShine{0%{transform:translateX(-100%) skewX(-15deg)}100%{transform:translateX(350%) skewX(-15deg)}}
-.filter-toggle{display:flex;align-items:center;gap:9px;background:#1b1f2a;border:1px solid #262b3a;border-radius:16px;padding:13px 16px;cursor:pointer;font-size:14px;font-weight:500;color:#9b9aa8;transition:border-color .2s;width:100%;text-align:left;position:relative;overflow:hidden}
+.filter-toggle{display:flex;align-items:center;gap:9px;background:#1b1f2a;border:1px solid #262b3a;border-radius:16px;padding:13px 16px;cursor:pointer;font-size:14px;font-weight:500;color:#f0effe;transition:border-color .2s;width:100%;text-align:left;position:relative;overflow:hidden}
 .filter-toggle::after{content:'';position:absolute;top:0;left:0;width:40%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);transform:translateX(-100%) skewX(-15deg);animation:filterShine 4.5s ease-in-out infinite;animation-delay:2s}
 .filter-toggle.has-filters{border-color:#7c5cff;color:#a78bfa}
 .filter-badge{background:#7c5cff;color:#fff;font-size:10px;font-weight:700;min-width:18px;height:18px;border-radius:9px;padding:0 5px;display:none;align-items:center;justify-content:center}
@@ -59,7 +59,7 @@ html,body{height:100%;background:#1a1a2e;color:#f4f3f7;overscroll-behavior:none}
 .fapply:active{transform:scale(.96)}
 
 /* CATEGORIES */
-.sec-label{font-size:11px;font-weight:700;color:#5a5968;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px;animation:fadeUp .45s .1s ease both}
+.sec-label{font-size:11px;font-weight:700;color:#f0effe;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px;animation:fadeUp .45s .1s ease both}
 .cat-list{display:flex;flex-direction:column;gap:11px;animation:fadeUp .45s .12s ease both}
 .cat-card{position:relative;border-radius:22px;padding:18px 20px;overflow:hidden;cursor:pointer;display:flex;align-items:center;gap:15px;transform:scale(1);transition:transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .22s ease;}
 .cat-card:active{transform:scale(.96);}
@@ -87,7 +87,15 @@ html,body{height:100%;background:#1a1a2e;color:#f4f3f7;overscroll-behavior:none}
 .overlay{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:22px 22px 160px 22px;pointer-events:none;opacity:0;transition:opacity .28s ease}
 .overlay.show{opacity:1;pointer-events:all}
 .overlay-bg{position:absolute;inset:0;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);background:rgba(10,12,18,.45);cursor:pointer}
-.idea-card{position:relative;z-index:1;background:#ffffff;border-radius:24px;padding:0;width:300px;max-width:300px;box-shadow:0 32px 80px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.08);animation:ideaIn .4s cubic-bezier(.34,1.4,.64,1) both;overflow:hidden}
+.idea-card{position:relative;z-index:10;background:#ffffff;border-radius:24px;padding:0;width:300px;max-width:300px;box-shadow:0 32px 80px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.08);overflow:hidden;touch-action:pan-y;cursor:grab;will-change:transform;transition:transform .35s cubic-bezier(.4,0,.2,1),opacity .35s ease}
+.idea-card.dragging{cursor:grabbing;transition:none!important}
+.idea-card.animate-in{animation:ideaIn .4s cubic-bezier(.34,1.4,.64,1) both}
+
+.card-stack{position:relative;width:300px;max-width:300px;min-height:420px}
+.idea-card{position:absolute;top:0;left:0;right:0;transform:translateY(var(--y,0px)) scale(var(--s,1)) rotate(var(--r,0deg));transition:transform .3s cubic-bezier(.4,0,.2,1),opacity .3s ease}
+.idea-card.pos-0{z-index:10;--y:0px;touch-action:none}
+.idea-card.pos-1{z-index:2;pointer-events:none;cursor:default}
+.idea-card.pos-2{z-index:1;pointer-events:none;cursor:default}
 .idea-card-header{padding:16px 18px 14px;border-bottom:1px solid #f0f0f0;position:relative}
 .idea-card-brand{font-size:8px;font-weight:800;letter-spacing:2.5px;color:#cccccc;text-transform:uppercase;margin-bottom:12px;text-align:center}
 .idea-card-body{padding:14px 18px 18px;background:#ffffff}
@@ -252,34 +260,10 @@ html,body{height:100%;background:#1a1a2e;color:#f4f3f7;overscroll-behavior:none}
   <!-- OVERLAY -->
   <div class="overlay" id="overlay">
     <div class="overlay-bg" onclick="dismissIdea()"></div>
-    <div class="idea-card" id="ideaCard">
-      <div class="idea-card-header">
-        <div class="idea-card-brand">IDEA JAR</div>
-        <button class="idea-dismiss" onclick="dismissIdea()">×</button>
-        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:14px;min-height:26px">
-          <div class="idea-badge" id="ideaBadge"></div>
-          <div id="ideaCatTags" style="display:flex;flex-wrap:wrap;gap:6px;align-items:center"></div>
-        </div>
-        <div class="idea-title" id="ideaTitle"></div>
-        <div class="idea-sub" id="ideaSub"></div>
-      </div>
-      <div class="idea-card-body">
-        <div class="idea-tags" id="ideaTags"></div>
-        <div class="idea-btns">
-          <div class="idea-btn-wrap">
-            <button class="idea-btn-share" onclick="shareIdea()">📤</button>
-            <span class="idea-btn-label">Share</span>
-          </div>
-          <div class="idea-btn-wrap">
-            <button class="idea-btn-done" id="ideaDoneBtn" onclick="toggleDone()"><span id="doneIcon" style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:20px;line-height:1"></span></button>
-            <span class="idea-btn-label">Did it!</span>
-          </div>
-          <div class="idea-btn-wrap">
-            <button class="idea-btn-save" id="ideaSaveBtn" onclick="toggleSave()"><span id="saveIcon" style="font-size:20px">🤍</span></button>
-            <span class="idea-btn-label">Save</span>
-          </div>
-        </div>
-      </div>
+    <div class="card-stack" id="cardStack">
+      <div class="idea-card" id="ideaCardC"></div>
+      <div class="idea-card" id="ideaCardB"></div>
+      <div class="idea-card" id="ideaCardA"></div>
     </div>
   </div>
 
